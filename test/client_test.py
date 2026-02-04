@@ -109,6 +109,45 @@ class DataApiTest(unittest.TestCase):
     def test_kline_daily(self):
         self._call_api_method("daily", code="600871", date1="2026-02-01", date2="2026-02-03")
 
+    def test_sentiment_market_hot_day(self):
+        self._call_api_method("sentiment_market_hot_day", date="2026-02-03")
+
+    def test_sentiment_trend_no_date(self):
+        self._call_api_method("sentiment_trend", model=0)
+
+    def test_sentiment_trend_with_date(self):
+        self._call_api_method("sentiment_trend", model=0, date1="2026-02-03")
+
+    def test_sentiment_trend_range(self):
+        self._call_api_method("sentiment_trend_range", model=1, date1="2026-01-01", date2="2026-02-03")
+
+    def test_review_uplimit_reason_default(self):
+        self._call_api_method("review_uplimit_reason")
+
+    def test_review_uplimit_reason_custom(self):
+        self._call_api_method("review_uplimit_reason", date1="2026-02-03", group=0, page=2, page_size=30)
+
+    def test_review_uplimit_hot_open(self):
+        self._call_api_method("review_uplimit_hot_open", date1="2026-02-03")
+
+    def test_stock_uplimit_reason_recent(self):
+        self._call_api_method("stock_uplimit_reason", stock_code="600871")
+
+    def test_stock_uplimit_reason_specified_date(self):
+        self._call_api_method("stock_uplimit_reason", stock_code="600871", date="2026-02-03")
+
+    def test_stock_uplimit_reason_history_default(self):
+        self._call_api_method("stock_uplimit_reason_history", stock_code="000001")
+
+    def test_stock_uplimit_reason_history_page2(self):
+        self._call_api_method("stock_uplimit_reason_history", stock_code="000001", page=2, pageSize=20)
+
+    def test_review_uplimit_reason_open_simple(self):
+        self._call_api_method("review_uplimit_reason_open", date1="2026-02-03")
+
+    def test_stock_info_basic(self):
+        self._call_api_method("stock_info", stock_id="600871", info_type=1)
+
 
 if __name__ == "__main__":
     unittest.main()

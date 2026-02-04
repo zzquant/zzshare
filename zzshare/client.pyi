@@ -1,6 +1,9 @@
 # data_api.pyi
 from typing import Any, Dict, List, Optional
 
+from pandas import DataFrame
+
+
 class DataApi:
     def __init__(
         self,
@@ -59,12 +62,69 @@ class DataApi:
         date1: str
     ) -> Any: ...
 
-    def market_sentiment_hot_day(self, date1: str) -> Optional[List[Dict]]: ...
-
     def market_style(self, date1: str) -> Any: ...
 
     def open_sentiment_data(
         self,
         date1: str,
         date2: Optional[str] = None
+    ) -> Any: ...
+
+    def daily(self, code: str, date1: Optional[str] = None, date2: Optional[str] = None) -> DataFrame: ...
+
+    def trade_days(self, day_start: Optional[str] = None, day_end: Optional[str] = None, days: int = None) -> Any: ...
+
+    def sentiment_market_hot_day(self, date: str) -> Any: ...
+
+    def sentiment_trend(
+        self,
+        model: int,
+        date1: Optional[str] = None
+    ) -> Any: ...
+
+    def sentiment_trend_range(
+        self,
+        model: int,
+        date1: Optional[str] = None,
+        date2: Optional[str] = None
+    ) -> Any: ...
+
+    def review_uplimit_reason(
+        self,
+        date1: Optional[str] = None,
+        group: Optional[int] = 1,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None
+    ) -> Any: ...
+
+    def review_uplimit_hot_open(
+        self,
+        date1: Optional[str] = None,
+        date2: Optional[str] = None,
+        board: Optional[str] = None,
+        limit: Optional[int] = None
+    ) -> Any: ...
+
+    def stock_uplimit_reason(
+        self,
+        stock_code: str,
+        date: Optional[str] = None
+    ) -> Any: ...
+
+    def stock_uplimit_reason_history(
+        self,
+        stock_code: str,
+        page: int = 1,
+        pageSize: int = 10
+    ) -> Any: ...
+
+    def review_uplimit_reason_open(
+        self,
+        date1: Optional[str] = None
+    ) -> Any: ...
+
+    def stock_info(
+        self,
+        stock_id: str,
+        info_type: int
     ) -> Any: ...

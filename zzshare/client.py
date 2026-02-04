@@ -43,11 +43,6 @@ class DataApi(BaseDataApi):
             ["date1", "date2"],
             None
         ),
-        "market_sentiment_hot_day": (
-            "v2/api/sentiment/market/hot/day",
-            ["date"],
-            None
-        ),
         "market_style": (
             "v2/api/timing/market/style",
             ["date1"],
@@ -79,6 +74,48 @@ class DataApi(BaseDataApi):
         "stock_ths_hot": (
             "v2/api/sentiment/media/ths/symbol/{code}",
             ["code", "date1"],
+            None
+        ),
+        "sentiment_market_hot_day": (
+            "v3/api/sentiment/market/hot/day",
+            ["date"],
+            None
+        ),
+        "sentiment_trend": (
+            "v3/api/sentiment/trend/{model}",
+            ["model", "date1"],
+            None
+        ),
+        "sentiment_trend_range": (
+            "v3/api/sentiment/trend/{model}/range",
+            ["model", "date1", "date2"],
+            None
+        ),
+        "review_uplimit_reason": (
+            "v3/api/review/uplimit/reason",
+            ["date1", "group", "page", "page_size"],
+            None
+        ),
+        "review_uplimit_hot_open": (
+            "v3/open/review/uplimit/hot",
+            ["date1", "date2", "board", "limit"],
+            None
+        ),
+        "stock_uplimit_reason": (
+            "v3/open/stock/uplimit/reason/{stock_code}",
+            ["stock_code", "date"],
+            None
+        ),
+        "stock_uplimit_reason_history": (
+            "v3/open/stock/uplimit/reason/history/{stock_code}", ["stock_code", "page", "pageSize"], None),
+        "review_uplimit_reason_open": (
+            "v3/open/review/uplimit/reason",
+            ["date1"],
+            None
+        ),
+        "stock_info": (
+            "v3/open/stock/info",
+            ["stock_id", "info_type"],
             None
         ),
     }
