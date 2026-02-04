@@ -3,6 +3,7 @@ import requests
 from typing import Any, Optional, Dict, Callable, List, Tuple, Union
 
 from zzshare.core import BaseDataApi
+from zzshare.utils import kline_data_to_df
 
 
 class DataApi(BaseDataApi):
@@ -10,6 +11,7 @@ class DataApi(BaseDataApi):
         super().__init__(token, timeout, http_url)
 
     SHORTCUTS = {
+        # Daily
         "uplimit_hot": (
             "open/review/uplimit/hot",
             ["date1", "board"],
@@ -20,6 +22,7 @@ class DataApi(BaseDataApi):
             ["date1"],
             None
         ),
+        # Sentiment Data
         "market_plate_stocks": (
             "market/plates/17/{plate_code}/stocks/rank",
             ["plate_code", "date1", "is_real", "limit"],
@@ -40,16 +43,6 @@ class DataApi(BaseDataApi):
             ["date1", "date2"],
             None
         ),
-        "ths_hot_top": (
-            "open/sentiment/media/ths2/top",
-            ["date1", "top_n"],
-            None
-        ),
-        "stock_ths_hot": (
-            "v2/api/sentiment/media/ths/symbol/{code}",
-            ["code", "date1"],
-            None
-        ),
         "market_sentiment_hot_day": (
             "v2/api/sentiment/market/hot/day",
             ["date"],
@@ -63,6 +56,29 @@ class DataApi(BaseDataApi):
         "open_sentiment_data": (
             "open/sentiment/data",
             ["date1", "date2"],
+            None
+        ),
+        # Kline
+        "daily": (
+            "open/kline/d/{code}",
+            ["code", "date1", "date2"],
+            kline_data_to_df
+        ),
+        # Base Data
+        "trade_days": (
+            "market/trade/days",
+            ["day_start", "day_end", "days"],
+            None
+        ),
+        # Third Party
+        "ths_hot_top": (
+            "open/sentiment/media/ths2/top",
+            ["date1", "top_n"],
+            None
+        ),
+        "stock_ths_hot": (
+            "v2/api/sentiment/media/ths/symbol/{code}",
+            ["code", "date1"],
             None
         ),
     }

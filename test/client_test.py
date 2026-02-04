@@ -53,7 +53,7 @@ class DataApiTest(unittest.TestCase):
         self._call_api_method("uplimit_stocks", date1="2026-02-03")
 
     def test_market_plate_stocks_default(self):
-        self._call_api_method("market_plate_stocks", plate_code="gn_diaosi", date1="2026-02-03")
+        self._call_api_method("market_plate_stocks", plate_code="801070", date1="2026-02-03")
 
     def test_market_plate_stocks_with_limit(self):
         self._call_api_method("market_plate_stocks", plate_code="801070", date1="2026-02-03", limit=10)
@@ -99,6 +99,15 @@ class DataApiTest(unittest.TestCase):
 
     def test_open_sentiment_data_range(self):
         self._call_api_method("open_sentiment_data", date1="2026-02-01", date2="2026-02-03")
+
+    def test_trade_days_range(self):
+        self._call_api_method("trade_days", day_start="2026-02-01", day_end="2026-02-03")
+
+    def test_trade_days_count(self):
+        self._call_api_method("trade_days", days=3)
+
+    def test_kline_daily(self):
+        self._call_api_method("daily", code="600871", date1="2026-02-01", date2="2026-02-03")
 
 
 if __name__ == "__main__":
