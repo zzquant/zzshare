@@ -118,6 +118,115 @@ class DataApi(BaseDataApi):
             ["stock_id", "info_type"],
             None
         ),
+        # ================== 新增接口 ==================
+        # 龙虎榜数据
+        "lhb_list": (
+            "market/lhb/list",
+            ["date1"],
+            None
+        ),
+        "lhb_detail": (
+            "market/lhb/detail",
+            ["date1", "stock_code"],
+            None
+        ),
+        "lhb_stock_history": (
+            "market/lhb/stock/history",
+            ["stock_code", "trader_name"],
+            None
+        ),
+        "lhb_trader_history": (
+            "market/lhb/trader/history",
+            ["trader_name", "trader_id", "stock_code", "page", "per_page"],
+            None
+        ),
+        # 板块数据
+        "plates_list": (
+            "market/plates/{plate_type}",
+            ["plate_type"],
+            None
+        ),
+        "plates_rank": (
+            "market/plates/{plate_type}/rank",
+            ["plate_type", "date1", "limit"],
+            None
+        ),
+        "plates_trend": (
+            "market/plates/{plate_type}/trend",
+            ["plate_type", "plate_code", "day_start", "day_end"],
+            None
+        ),
+        "plates_stocks": (
+            "market/plates/{plate_type}/{plate_code}/stocks",
+            ["plate_type", "plate_code", "date"],
+            None
+        ),
+        # 涨跌分布与情绪
+        "updown_distribution": (
+            "open/sentiment/updown/disctribution",
+            ["date1"],
+            None
+        ),
+        "uplimit_trend": (
+            "open/sentiment/uplimit/trend",
+            ["date1"],
+            None
+        ),
+        "sentiment_hot_day": (
+            "open/sentiment/hot/day",
+            ["index", "st"],
+            None
+        ),
+        "sentiment_level": (
+            "open/sentiment/level",
+            ["date"],
+            None
+        ),
+        "sentiment_bull_data": (
+            "open/sentiment/bull/data",
+            ["date1", "date2"],
+            None
+        ),
+        # 行情实时数据
+        "market_real": (
+            "open/market/real",
+            ["symbols"],
+            None
+        ),
+        "stock_moneyflow": (
+            "open/stock/{stock_id}/moneyflow",
+            ["stock_id", "m_type"],
+            None
+        ),
+        "market_mf": (
+            "open/market/mf",
+            ["stock", "date", "wm", "default_v"],
+            None
+        ),
+        # 涨停市值统计
+        "uplimit_market_value": (
+            "v2/api/uplimit/market/value",
+            ["date1", "date2"],
+            None
+        ),
+        # 市场TopN情绪
+        "sentiment_market_top_n": (
+            "v2/api/sentiment/market/top/n",
+            ["modal_id", "date1", "date2"],
+            None
+        ),
+        # 异动数据
+        "movement_alerts": (
+            "market/movement/alerts",
+            ["date1", "type", "limit", "is_real"],
+            None
+        ),
+        # 监控数据
+        "zdjk_get": (
+            "open/zdjk/get",
+            ["date1", "date2"],
+            None
+        ),
     }
 
     def _register_shortcuts(self):

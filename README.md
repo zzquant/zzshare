@@ -2,6 +2,273 @@
 
 `zzshare` 是一个兼容 `tushare pro` 接口规范的 Python 数据包，底层数据对接 `zzzz-market-api`。
 
+---
+
+## 🔥 快捷接口 (SHORTCUTS)
+
+以下为 `DataApi` 类提供的已实现快捷方法，可直接调用：
+
+### 初始化
+
+```python
+from zzshare.client import DataApi
+
+api = DataApi(http_url='http://127.0.0.1:9001')
+```
+
+---
+
+### 📊 复盘数据
+
+| 方法名 | 描述 | 参数 |
+|:---|:---|:---|
+| `uplimit_hot` | 涨停热门板块 | `date1` (日期), `board` (板块, 可选) |
+| `uplimit_stocks` | 涨停股票列表 | `date1` (日期) |
+| `review_uplimit_reason` | 涨停原因复盘 | `date1`, `group` (分组), `page`, `page_size` |
+| `review_uplimit_hot_open` | 涨停热门 (Open) | `date1`, `date2`, `board`, `limit` |
+| `review_uplimit_reason_open` | 涨停原因 (Open) | `date1` |
+
+**示例**:
+```python
+# 获取某日涨停热门板块
+data = api.uplimit_hot(date1='20250101')
+
+# 获取某日涨停股票
+stocks = api.uplimit_stocks(date1='20250101')
+```
+
+---
+
+### 📈 情绪数据
+
+| 方法名 | 描述 | 参数 |
+|:---|:---|:---|
+| `market_sentiment` | 市场情绪 K 线 (日) | `date1`, `date2` |
+| `market_hot_sentiment` | 热门情绪 K 线 (日) | `date1`, `date2` |
+| `market_style` | 市场风格择时 | `date1` |
+| `open_sentiment_data` | 情绪数据 (Open) | `date1`, `date2` |
+| `sentiment_market_hot_day` | 当日市场热度 | `date` |
+| `sentiment_trend` | 情绪趋势 | `model` (模型编号), `date1` |
+| `sentiment_trend_range` | 情绪趋势区间 | `model`, `date1`, `date2` |
+
+**示例**:
+```python
+# 获取市场情绪数据
+sentiment = api.market_sentiment(date1='20250101', date2='20250131')
+
+# 获取情绪趋势
+trend = api.sentiment_trend(model=1, date1='20250101')
+```
+
+---
+
+### 🏷️ 板块数据
+
+| 方法名 | 描述 | 参数 |
+|:---|:---|:---|
+| `market_plate` | 板块排行 | `date1`, `limit` (数量) |
+| `market_plate_stocks` | 板块成分股排行 | `plate_code`, `date1`, `is_real`, `limit` |
+
+**示例**:
+```python
+# 获取板块排行
+plates = api.market_plate(date1='20250101', limit=10)
+
+# 获取某板块成分股
+stocks = api.market_plate_stocks(plate_code='123456', date1='20250101')
+```
+
+---
+
+### 📉 K 线数据
+
+| 方法名 | 描述 | 参数 | 返回 |
+|:---|:---|:---|:---|
+| `daily` | 日线行情 | `code` (股票代码), `date1`, `date2` | `DataFrame` |
+
+**示例**:
+```python
+# 获取某只股票日线数据
+df = api.daily(code='000001', date1='20250101', date2='20250131')
+print(df)
+```
+
+---
+
+### 📅 基础数据
+
+| 方法名 | 描述 | 参数 |
+|:---|:---|:---|
+| `trade_days` | 交易日历表 | `day_start`, `day_end`, `days` |
+
+**示例**:
+```python
+# 获取最近 30 个交易日
+days = api.trade_days(days=30)
+```
+
+---
+
+### 🔥 第三方热度数据
+
+| 方法名 | 描述 | 参数 |
+|:---|:---|:---|
+| `ths_hot_top` | 同花顺热度排行 | `date1`, `top_n` (数量) |
+| `stock_ths_hot` | 个股同花顺热度 | `code` (股票代码), `date1` |
+
+**示例**:
+```python
+# 获取同花顺热度 Top 100
+hot_top = api.ths_hot_top(date1='20250101', top_n=100)
+
+# 获取某只股票的同花顺热度
+stock_hot = api.stock_ths_hot(code='000001', date1='20250101')
+```
+
+---
+
+### 📌 个股数据
+
+| 方法名 | 描述 | 参数 |
+|:---|:---|:---|
+| `stock_uplimit_reason` | 个股涨停原因 | `stock_code`, `date` |
+| `stock_uplimit_reason_history` | 个股涨停历史 | `stock_code`, `page`, `pageSize` |
+| `stock_info` | 个股信息 | `stock_id`, `info_type` |
+| `stock_moneyflow` | 个股资金流向 | `stock_id`, `m_type` |
+
+**示例**:
+```python
+# 获取某只股票涨停原因
+reason = api.stock_uplimit_reason(stock_code='000001', date='20250101')
+
+# 获取某只股票涨停历史
+history = api.stock_uplimit_reason_history(stock_code='000001', page=1, pageSize=10)
+
+# 获取个股信息
+info = api.stock_info(stock_id='000001', info_type=1)
+```
+
+---
+
+### 🐉 龙虎榜数据
+
+| 方法名 | 描述 | 参数 |
+|:---|:---|:---|
+| `lhb_list` | 龙虎榜列表 | `date1` |
+| `lhb_detail` | 龙虎榜详情 | `date1`, `stock_code` |
+| `lhb_stock_history` | 个股龙虎榜历史 | `stock_code`, `trader_name` (可选) |
+| `lhb_trader_history` | 席位交易历史 | `trader_name`, `trader_id`, `stock_code`, `page`, `per_page` |
+
+**示例**:
+```python
+# 获取某日龙虎榜
+lhb = api.lhb_list(date1='20250101')
+
+# 获取龙虎榜详情
+detail = api.lhb_detail(date1='20250101', stock_code='000001')
+
+# 获取某只股票龙虎榜历史
+history = api.lhb_stock_history(stock_code='000001')
+```
+
+---
+
+### 🏷️ 板块扩展数据
+
+| 方法名 | 描述 | 参数 |
+|:---|:---|:---|
+| `plates_list` | 板块列表 | `plate_type` |
+| `plates_rank` | 板块排名 | `plate_type`, `date1`, `limit` |
+| `plates_trend` | 板块趋势 | `plate_type`, `plate_code`, `day_start`, `day_end` |
+| `plates_stocks` | 板块成分股 | `plate_type`, `plate_code`, `date` |
+
+**示例**:
+```python
+# 获取板块列表 (7=精选, 5=概念, 4=行业)
+plates = api.plates_list(plate_type=7)
+
+# 获取板块排名
+rank = api.plates_rank(plate_type=7, date1='20250101', limit=20)
+
+# 获取板块趋势
+trend = api.plates_trend(plate_type=7, plate_code='123456', day_start='20250101', day_end='20250131')
+```
+
+---
+
+### 📊 涨跌分布与情绪
+
+| 方法名 | 描述 | 参数 |
+|:---|:---|:---|
+| `updown_distribution` | 涨跌分布 | `date1` |
+| `uplimit_trend` | 涨停趋势 | `date1` |
+| `sentiment_hot_day` | 日度市场热度 | `index`, `st` |
+| `sentiment_level` | 情绪级别 | `date` |
+| `sentiment_bull_data` | 牛熊情绪数据 | `date1`, `date2` |
+
+**示例**:
+```python
+# 获取涨跌分布
+dist = api.updown_distribution(date1='20250101')
+
+# 获取涨停趋势
+trend = api.uplimit_trend(date1='20250101')
+
+# 获取情绪级别
+level = api.sentiment_level(date='20250101')
+```
+
+---
+
+### 📈 行情实时数据
+
+| 方法名 | 描述 | 参数 |
+|:---|:---|:---|
+| `market_real` | 行情实时快照 | `symbols` (逗号分隔) |
+| `market_mf` | 资金流向分钟 | `stock`, `date`, `wm`, `default_v` |
+
+**示例**:
+```python
+# 获取多只股票实时行情
+real = api.market_real(symbols='000001,000002,000003')
+
+# 获取资金流向分钟数据
+mf = api.market_mf(stock='000001', date='2025-01-01 0930')
+```
+
+---
+
+### 📉 涨停市值与异动
+
+| 方法名 | 描述 | 参数 |
+|:---|:---|:---|
+| `uplimit_market_value` | 涨停市值统计 | `date1`, `date2` |
+| `sentiment_market_top_n` | 市场 TopN 情绪 | `modal_id`, `date1`, `date2` |
+| `movement_alerts` | 异动数据 | `date1`, `type`, `limit`, `is_real` |
+| `zdjk_get` | 监控数据 | `date1`, `date2` |
+
+**示例**:
+```python
+# 获取涨停市值统计
+mv = api.uplimit_market_value(date1='20250101', date2='20250131')
+
+# 获取异动数据
+alerts = api.movement_alerts(date1='20250101', limit=100)
+```
+
+---
+
+### 🔧 通用查询
+
+除了以上快捷方法，还可以使用通用 `query` 方法自定义调用任意 API：
+
+```python
+# 通用查询
+result = api.query('your/custom/path', params={'key': 'value'})
+```
+
+---
+
 ## 📦 安装
 
 ```bash
