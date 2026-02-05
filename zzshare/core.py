@@ -4,7 +4,7 @@ from typing import Any, Optional, Dict, Callable, List, Tuple, Union
 
 
 class BaseDataApi:
-    def __init__(self, token: str = '', timeout: int = 10, http_url: str = 'http://127.0.0.1:9001'):
+    def __init__(self, token: str = '', timeout: int = 10, http_url: str = 'https://api.zizizaizai.com'):
         self.token = token
         self.timeout = timeout
         self.http_url = http_url.rstrip('/')

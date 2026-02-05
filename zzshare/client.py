@@ -7,7 +7,7 @@ from zzshare.utils import kline_data_to_df
 
 
 class DataApi(BaseDataApi):
-    def __init__(self, token: str = '', timeout: int = 10, http_url: str = 'http://127.0.0.1:9001'):
+    def __init__(self, token: str = '', timeout: int = 10, http_url: str = 'https://api.zizizaizai.com'):
         super().__init__(token, timeout, http_url)
 
     SHORTCUTS = {

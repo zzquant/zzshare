@@ -13,7 +13,7 @@
 ```python
 from zzshare.client import DataApi
 
-api = DataApi(http_url='http://127.0.0.1:9001')
+api = DataApi()
 ```
 
 ---
@@ -461,6 +461,4 @@ print(df_limit)
 
 ## ⚙️ 配置说明
 
-默认连接本地后端服务：
-- URL: `http://127.0.0.1:9001`
-- 可在 `zzshare.client.DataApi` 中修改默认配置或通过构造函数传入。
+可在 `zzshare.client.DataApi` 中通过构造函数传入自定义配置。
