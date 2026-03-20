@@ -126,20 +126,6 @@ df_all = api.stock_basic(
     fields='ts_code,symbol,name,market,exchange,list_status'
 )
 
-# 获取退市股票
-df_delisted = api.stock_basic(
-    exchange='ALL',
-    list_status='D',
-    fields='ts_code,symbol,name,exchange,list_status'
-)
-
-# list_status='P'（上市暂停）当前返回空表，字段结构与 tushare 对齐
-df_pause = api.stock_basic(
-    exchange='ALL',
-    list_status='P',
-    fields='ts_code,symbol,name,exchange,list_status'
-)
-
 ```
 
 `stock_basic` 的 `exchange` 支持以下取值（大小写不敏感）：
