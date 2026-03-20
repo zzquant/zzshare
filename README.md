@@ -11,7 +11,7 @@
   </p>
 </p>
 
----
+***
 
 ## ✨ 特性
 
@@ -21,7 +21,7 @@
 - ⚡ **实时数据** - 支持实时行情、资金流向等盘中数据
 - 🐍 **类型提示** - 完整的 `.pyi` 类型文件，IDE 自动补全
 
----
+***
 
 ## 📦 安装
 
@@ -37,7 +37,7 @@ cd zzshare
 pip install -e .
 ```
 
----
+***
 
 ## 🚀 快速开始
 
@@ -67,31 +67,95 @@ ths_top = api.ths_hot_top(date1='20250205', top_n=100)
 
 # 获取交易日历
 days = api.trade_days(days=30)
+
+# tushare 兼容：获取股票基础信息
+basic = api.stock_basic(exchange='SSE', list_status='L', fields='ts_code,symbol,name,exchange,list_status')
 ```
 
----
+***
 
 ## 📊 接口一览
 
 ### 核心接口 (已实现)
 
-| 分类 | 接口 | 描述 |
-|:---|:---|:---|
-| **日线数据** | `daily` | 个股日K线，返回 DataFrame |
-| **涨停复盘** | `uplimit_hot` `uplimit_stocks` | 涨停热门板块、涨停股票 |
-| **涨停原因** | `stock_uplimit_reason` `review_uplimit_reason` | 个股/全市场涨停原因 |
-| **龙虎榜** | `lhb_list` `lhb_detail` `lhb_stock_history` | 龙虎榜列表、详情、历史 |
-| **板块数据** | `plates_list` `plates_rank` `market_plate` | 板块列表、排名、热门 |
-| **情绪指标** | `market_sentiment` `sentiment_trend` `sentiment_level` | 市场情绪K线、趋势、级别 |
-| **热度数据** | `ths_hot_top` `stock_ths_hot` | 同花顺热度排行、个股热度 |
-| **实时行情** | `market_real` `stock_moneyflow` | 实时快照、资金流向 |
-| **基础数据** | `trade_days` `stock_info` | 交易日历、个股信息 |
+| 分类       | 接口                                                     | 描述                           |
+| :------- | :----------------------------------------------------- | :--------------------------- |
+| **日线数据** | `daily`                                                | 个股日K线，返回 DataFrame           |
+| **涨停复盘** | `uplimit_hot` `uplimit_stocks`                         | 涨停热门板块、涨停股票                  |
+| **涨停原因** | `stock_uplimit_reason` `review_uplimit_reason`         | 个股/全市场涨停原因                   |
+| **龙虎榜**  | `lhb_list` `lhb_detail` `lhb_stock_history`            | 龙虎榜列表、详情、历史                  |
+| **板块数据** | `plates_list` `plates_rank` `market_plate`             | 板块列表、排名、热门                   |
+| **情绪指标** | `market_sentiment` `sentiment_trend` `sentiment_level` | 市场情绪K线、趋势、级别                 |
+| **热度数据** | `ths_hot_top` `stock_ths_hot`                          | 同花顺热度排行、个股热度                 |
+| **实时行情** | `market_real` `stock_moneyflow`                        | 实时快照、资金流向                    |
+| **基础数据** | `trade_days` `stock_info` `stock_basic`                | 交易日历、个股信息、股票基础信息（tushare 兼容） |
 
 > 💡 共计 **40+** 个已实现接口，完整列表见下方。
 
----
+***
 
 ## 📖 使用示例
+
+### 股票基础信息（tushare 兼容）
+
+```python
+# 获取上交所在市股票（默认 list_status='L'）
+df_sse = api.stock_basic(
+    exchange='SSE',
+    list_status='L',
+    fields='ts_code,symbol,name,exchange,list_status'
+)
+
+# exchange 为空时默认查询全市场（SS/KSH/SZ/GEM/BJ）
+df_all_default = api.stock_basic(
+    exchange='',
+    list_status='L',
+    fields='ts_code,symbol,name,exchange,list_status'
+)
+
+# 获取科创板股票（扩展市场）
+df_ksh = api.stock_basic(
+    exchange='KSH',
+    fields='ts_code,symbol,name,market,exchange'
+)
+
+# 获取全市场（含主板/科创板/创业板/北交所）
+df_all = api.stock_basic(
+    exchange='ALL',
+    list_status='L',
+    fields='ts_code,symbol,name,market,exchange,list_status'
+)
+
+# 获取退市股票
+df_delisted = api.stock_basic(
+    exchange='ALL',
+    list_status='D',
+    fields='ts_code,symbol,name,exchange,list_status'
+)
+
+# list_status='P'（上市暂停）当前返回空表，字段结构与 tushare 对齐
+df_pause = api.stock_basic(
+    exchange='ALL',
+    list_status='P',
+    fields='ts_code,symbol,name,exchange,list_status'
+)
+
+```
+
+`stock_basic` 的 `exchange` 支持以下取值（大小写不敏感）：
+
+- `SSE` 或 `SH` 或 `SS`：上海证券交易所（主板）
+- `KSH` 或 `STAR`：上海科创板
+- `SZSE` 或 `SZ`：深圳证券交易所（主板）
+- `BSE` 或 `BJ`：北京证券交易所
+- `GEM`：创业板（当前后端按独立市场维度提供）
+- `ALL`：全市场（SS/KSH/SZ/GEM/BJ）
+
+`stock_basic` 的 `list_status` 支持：
+
+- `L`：上市
+- `D`：退市
+- `P`：上市暂停（当前返回空表，但保留 tushare 兼容字段）
 
 ### 涨停复盘
 
@@ -152,97 +216,117 @@ level = api.sentiment_level(date='20250205')
 real = api.market_real(symbols='000001,000002,000003')
 ```
 
----
+***
 
 ## 📚 完整接口列表
 
 <details>
 <summary><b>点击展开全部接口</b></summary>
 
+### 基础数据
+
+| 方法名           | 描述                          | 参数                                                              |
+| :------------ | :-------------------------- | :-------------------------------------------------------------- |
+| `trade_days`  | 交易日历                        | `day_start`, `day_end`, `days`                                  |
+| `stock_basic` | 股票基础信息,各个市场股票列表（tushare 兼容） | `ts_code`, `exchange`, `list_status(L/D/P)`, `is_hs`, `fields`, `name` |
+
+`stock_basic.exchange` 说明：
+
+- `SSE/SH/SS` = 上交所
+- `KSH/STAR` = 科创板
+- `SZSE/SZ` = 深交所
+- `BSE/BJ` = 北交所
+- `GEM` = 创业板
+- `ALL` = 全市场（SS/KSH/SZ/GEM/BJ）
+
 ### 复盘数据
-| 方法名 | 描述 | 参数 |
-|:---|:---|:---|
-| `uplimit_hot` | 涨停热门板块 | `date1`, `board` |
-| `uplimit_stocks` | 涨停股票列表 | `date1` |
-| `review_uplimit_reason` | 涨停原因复盘 | `date1`, `group`, `page`, `page_size` |
-| `review_uplimit_hot_open` | 涨停热门 | `date1`, `date2`, `board`, `limit` |
-| `review_uplimit_reason_open` | 涨停原因 | `date1` |
+
+| 方法名                          | 描述     | 参数                                    |
+| :--------------------------- | :----- | :------------------------------------ |
+| `uplimit_hot`                | 涨停热门板块 | `date1`, `board`                      |
+| `uplimit_stocks`             | 涨停股票列表 | `date1`                               |
+| `review_uplimit_reason`      | 涨停原因复盘 | `date1`, `group`, `page`, `page_size` |
+| `review_uplimit_hot_open`    | 涨停热门   | `date1`, `date2`, `board`, `limit`    |
+| `review_uplimit_reason_open` | 涨停原因   | `date1`                               |
 
 ### 情绪数据
-| 方法名 | 描述 | 参数 |
-|:---|:---|:---|
-| `market_sentiment` | 市场情绪K线 | `date1`, `date2` |
-| `market_hot_sentiment` | 热门情绪K线 | `date1`, `date2` |
-| `market_style` | 市场风格择时 | `date1` |
-| `open_sentiment_data` | 情绪数据 | `date1`, `date2` |
-| `sentiment_market_hot_day` | 当日市场热度 | `date` |
-| `sentiment_trend` | 情绪趋势 | `model`, `date1` |
-| `sentiment_trend_range` | 情绪趋势区间 | `model`, `date1`, `date2` |
-| `updown_distribution` | 涨跌分布 | `date1` |
-| `uplimit_trend` | 涨停趋势 | `date1` |
-| `sentiment_hot_day` | 日度市场热度 | `index`, `st` |
-| `sentiment_level` | 情绪级别 | `date` |
-| `sentiment_bull_data` | 牛熊情绪 | `date1`, `date2` |
+
+| 方法名                        | 描述     | 参数                        |
+| :------------------------- | :----- | :------------------------ |
+| `market_sentiment`         | 市场情绪K线 | `date1`, `date2`          |
+| `market_hot_sentiment`     | 热门情绪K线 | `date1`, `date2`          |
+| `market_style`             | 市场风格择时 | `date1`                   |
+| `open_sentiment_data`      | 情绪数据   | `date1`, `date2`          |
+| `sentiment_market_hot_day` | 当日市场热度 | `date`                    |
+| `sentiment_trend`          | 情绪趋势   | `model`, `date1`          |
+| `sentiment_trend_range`    | 情绪趋势区间 | `model`, `date1`, `date2` |
+| `updown_distribution`      | 涨跌分布   | `date1`                   |
+| `uplimit_trend`            | 涨停趋势   | `date1`                   |
+| `sentiment_hot_day`        | 日度市场热度 | `index`, `st`             |
+| `sentiment_level`          | 情绪级别   | `date`                    |
+| `sentiment_bull_data`      | 牛熊情绪   | `date1`, `date2`          |
 
 ### 板块数据
-| 方法名 | 描述 | 参数 |
-|:---|:---|:---|
-| `market_plate` | 板块排行 | `date1`, `limit` |
-| `market_plate_stocks` | 板块成分股排行 | `plate_code`, `date1`, `is_real`, `limit` |
-| `plates_list` | 板块列表 | `plate_type` |
-| `plates_rank` | 板块排名 | `plate_type`, `date1`, `limit` |
-| `plates_trend` | 板块趋势 | `plate_type`, `plate_code`, `day_start`, `day_end` |
-| `plates_stocks` | 板块成分股 | `plate_type`, `plate_code`, `date` |
+
+| 方法名                   | 描述      | 参数                                                 |
+| :-------------------- | :------ | :------------------------------------------------- |
+| `market_plate`        | 板块排行    | `date1`, `limit`                                   |
+| `market_plate_stocks` | 板块成分股排行 | `plate_code`, `date1`, `is_real`, `limit`          |
+| `plates_list`         | 板块列表    | `plate_type`                                       |
+| `plates_rank`         | 板块排名    | `plate_type`, `date1`, `limit`                     |
+| `plates_trend`        | 板块趋势    | `plate_type`, `plate_code`, `day_start`, `day_end` |
+| `plates_stocks`       | 板块成分股   | `plate_type`, `plate_code`, `date`                 |
 
 ### K线数据
-| 方法名 | 描述 | 参数 | 返回 |
-|:---|:---|:---|:---|
+
+| 方法名     | 描述   | 参数                       | 返回        |
+| :------ | :--- | :----------------------- | :-------- |
 | `daily` | 日线行情 | `code`, `date1`, `date2` | DataFrame |
 
-### 基础数据
-| 方法名 | 描述 | 参数 |
-|:---|:---|:---|
-| `trade_days` | 交易日历 | `day_start`, `day_end`, `days` |
-
 ### 热度数据
-| 方法名 | 描述 | 参数 |
-|:---|:---|:---|
-| `ths_hot_top` | 同花顺热度排行 | `date1`, `top_n` |
-| `stock_ths_hot` | 个股同花顺热度 | `code`, `date1` |
+
+| 方法名             | 描述      | 参数               |
+| :-------------- | :------ | :--------------- |
+| `ths_hot_top`   | 同花顺热度排行 | `date1`, `top_n` |
+| `stock_ths_hot` | 个股同花顺热度 | `code`, `date1`  |
 
 ### 个股数据
-| 方法名 | 描述 | 参数 |
-|:---|:---|:---|
-| `stock_uplimit_reason` | 涨停原因 | `stock_code`, `date` |
+
+| 方法名                            | 描述   | 参数                               |
+| :----------------------------- | :--- | :------------------------------- |
+| `stock_uplimit_reason`         | 涨停原因 | `stock_code`, `date`             |
 | `stock_uplimit_reason_history` | 涨停历史 | `stock_code`, `page`, `pageSize` |
-| `stock_info` | 个股信息 | `stock_id`, `info_type` |
-| `stock_moneyflow` | 资金流向 | `stock_id`, `m_type` |
+| `stock_info`                   | 个股信息 | `stock_id`, `info_type`          |
+| `stock_moneyflow`              | 资金流向 | `stock_id`, `m_type`             |
 
 ### 龙虎榜
-| 方法名 | 描述 | 参数 |
-|:---|:---|:---|
-| `lhb_list` | 龙虎榜列表 | `date1` |
-| `lhb_detail` | 龙虎榜详情 | `date1`, `stock_code` |
-| `lhb_stock_history` | 个股龙虎榜历史 | `stock_code`, `trader_name` |
-| `lhb_trader_history` | 席位交易历史 | `trader_name`, `trader_id`, `stock_code`, `page`, `per_page` |
+
+| 方法名                  | 描述      | 参数                                                           |
+| :------------------- | :------ | :----------------------------------------------------------- |
+| `lhb_list`           | 龙虎榜列表   | `date1`                                                      |
+| `lhb_detail`         | 龙虎榜详情   | `date1`, `stock_code`                                        |
+| `lhb_stock_history`  | 个股龙虎榜历史 | `stock_code`, `trader_name`                                  |
+| `lhb_trader_history` | 席位交易历史  | `trader_name`, `trader_id`, `stock_code`, `page`, `per_page` |
 
 ### 实时数据
-| 方法名 | 描述 | 参数 |
-|:---|:---|:---|
-| `market_real` | 行情实时快照 | `symbols` |
-| `market_mf` | 资金流向分钟 | `stock`, `date`, `wm`, `default_v` |
+
+| 方法名           | 描述     | 参数                                 |
+| :------------ | :----- | :--------------------------------- |
+| `market_real` | 行情实时快照 | `symbols`                          |
+| `market_mf`   | 资金流向分钟 | `stock`, `date`, `wm`, `default_v` |
 
 ### 其他
-| 方法名 | 描述 | 参数 |
-|:---|:---|:---|
-| `uplimit_market_value` | 涨停市值统计 | `date1`, `date2` |
-| `sentiment_market_top_n` | 市场TopN情绪 | `modal_id`, `date1`, `date2` |
-| `movement_alerts` | 异动数据 | `date1`, `type`, `limit`, `is_real` |
-| `zdjk_get` | 监控数据 | `date1`, `date2` |
+
+| 方法名                      | 描述       | 参数                                  |
+| :----------------------- | :------- | :---------------------------------- |
+| `uplimit_market_value`   | 涨停市值统计   | `date1`, `date2`                    |
+| `sentiment_market_top_n` | 市场TopN情绪 | `modal_id`, `date1`, `date2`        |
+| `movement_alerts`        | 异动数据     | `date1`, `type`, `limit`, `is_real` |
+| `zdjk_get`               | 监控数据     | `date1`, `date2`                    |
 
 </details>
 
----
+***
 
 ## 🔧 通用查询
 
@@ -252,7 +336,7 @@ real = api.market_real(symbols='000001,000002,000003')
 result = api.query('your/custom/path', params={'key': 'value'})
 ```
 
----
+***
 
 ## ❓ 常见问题
 
@@ -279,13 +363,13 @@ Python 3.8+
 
 </details>
 
----
+***
 
 ## 📄 License
 
 MIT License
 
----
+***
 
 <p align="center">
   ⭐ 如果这个项目对你有帮助，请给它一个 Star！

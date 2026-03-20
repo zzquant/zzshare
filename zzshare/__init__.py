@@ -26,13 +26,40 @@ def daily(
     end_date: Optional[str] = None,
     date1: Optional[str] = None,
     date2: Optional[str] = None,
+    fields: Optional[str] = None,
+    **kwargs: Any,
 ):
-    use_code = code or ts_code
-    if not use_code:
-        raise ValueError("code 或 ts_code 不能为空")
-    use_date1 = date1 or trade_date or start_date
-    use_date2 = date2 or trade_date or end_date
-    return _get_default_api().daily(code=use_code, date1=use_date1, date2=use_date2)
+    return _get_default_api().daily(
+        code=code,
+        ts_code=ts_code,
+        trade_date=trade_date,
+        start_date=start_date,
+        end_date=end_date,
+        date1=date1,
+        date2=date2,
+        fields=fields,
+        **kwargs,
+    )
+
+
+def stock_basic(
+    ts_code: Optional[str] = None,
+    exchange: Optional[str] = None,
+    list_status: str = "L",
+    is_hs: Optional[str] = None,
+    fields: Optional[str] = None,
+    name: Optional[str] = None,
+    **kwargs: Any,
+):
+    return _get_default_api().stock_basic(
+        ts_code=ts_code,
+        exchange=exchange,
+        list_status=list_status,
+        is_hs=is_hs,
+        fields=fields,
+        name=name,
+        **kwargs,
+    )
 
 
 def query(api_name: str, params: Optional[dict] = None):
@@ -48,9 +75,9 @@ def _create_shortcut_proxy(name: str) -> Callable[..., Any]:
 
 
 for _shortcut_name in DataApi.SHORTCUTS:
-    if _shortcut_name == "daily":
+    if _shortcut_name in {"daily", "stock_basic"}:
         continue
     globals()[_shortcut_name] = _create_shortcut_proxy(_shortcut_name)
 
 
-__all__ = ["DataApi", "pro_api", "daily", "query", *[name for name in DataApi.SHORTCUTS if name != "daily"]]
+__all__ = ["DataApi", "pro_api", "daily", "stock_basic", "query", *[name for name in DataApi.SHORTCUTS if name != "daily"]]

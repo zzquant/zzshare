@@ -70,7 +70,29 @@ class DataApi:
         date2: Optional[str] = None
     ) -> Any: ...
 
-    def daily(self, code: str, date1: Optional[str] = None, date2: Optional[str] = None) -> DataFrame: ...
+    def daily(
+        self,
+        ts_code: Optional[str] = None,
+        trade_date: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        code: Optional[str] = None,
+        date1: Optional[str] = None,
+        date2: Optional[str] = None,
+        fields: Optional[str] = None,
+        **kwargs: Any
+    ) -> DataFrame: ...
+
+    def stock_basic(
+        self,
+        ts_code: Optional[str] = None,
+        exchange: Optional[str] = None,
+        list_status: str = "L",
+        is_hs: Optional[str] = None,
+        fields: Optional[str] = None,
+        name: Optional[str] = None,
+        **kwargs: Any
+    ) -> DataFrame: ...
 
     def trade_days(self, day_start: Optional[str] = None, day_end: Optional[str] = None, days: int = None) -> Any: ...
 

@@ -1,6 +1,7 @@
 from functools import partial
 import requests
 from typing import Any, Optional, Dict, Callable, List, Tuple, Union
+import pandas as pd
 
 from zzshare.core import BaseDataApi
 from zzshare.utils import kline_data_to_df
@@ -232,6 +233,8 @@ class DataApi(BaseDataApi):
     def _register_shortcuts(self):
         """根据 SHORTCUTS 表动态生成方法"""
         for name, (path_template, param_names, post_process) in self.SHORTCUTS.items():
+            if name == "daily":
+                continue
             def make_method(
                     template: str = path_template,
                     params_list: List[str] = param_names,
@@ -266,3 +269,222 @@ class DataApi(BaseDataApi):
                 setattr(self, name, shortcut_method)
 
             make_method()
+
+    @staticmethod
+    def _normalize_symbol(symbol: str) -> str:
+        return symbol.split(".")[0] if "." in symbol else symbol
+
+    @staticmethod
+    def _to_tushare_ts_code(symbol: str) -> str:
+        normalized = symbol.strip().upper()
+        if "." in normalized:
+            code, suffix = normalized.split(".", 1)
+            suffix_map = {
+                "SS": "SH",
+                "SH": "SH",
+                "XSHG": "SH",
+                "SZ": "SZ",
+                "XSHE": "SZ",
+                "BJ": "BJ",
+                "BSE": "BJ",
+            }
+            return f"{code}.{suffix_map.get(suffix, suffix)}"
+        if normalized.startswith(("6", "5")):
+            return f"{normalized}.SH"
+        if normalized.startswith(("0", "3")):
+            return f"{normalized}.SZ"
+        if normalized.startswith(("8", "4", "2", "9")):
+            return f"{normalized}.BJ"
+        return normalized
+
+    @staticmethod
+    def _to_tushare_exchange(symbol: str) -> str:
+        code = symbol.split(".")[0] if "." in symbol else symbol
+        if code.startswith(("6", "5")):
+            return "SSE"
+        if code.startswith(("0", "3")):
+            return "SZSE"
+        if code.startswith(("8", "4", "2", "9")):
+            return "BSE"
+        return ""
+
+    @staticmethod
+    def _to_backend_exchange(exchange: Optional[str]) -> Optional[str]:
+        if not exchange:
+            return None
+        mapping = {
+            "SSE": "SS",
+            "SZSE": "SZ",
+            "BSE": "BJ",
+            "SH": "SS",
+            "SZ": "SZ",
+            "BJ": "BJ",
+            "GEM": "GEM",
+            "KSH": "KSH",
+            "STAR": "KSH",
+            "SS": "SS",
+            "ALL": "ALL",
+        }
+        return mapping.get(exchange.upper())
+
+    def daily(
+        self,
+        ts_code: Optional[str] = None,
+        trade_date: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        code: Optional[str] = None,
+        date1: Optional[str] = None,
+        date2: Optional[str] = None,
+        fields: Optional[str] = None,
+        **kwargs: Any
+    ):
+        use_code = ts_code or code
+        if not use_code:
+            raise ValueError("ts_code 或 code 不能为空")
+        normalized_symbol = self._normalize_symbol(use_code)
+        use_date1 = date1 or trade_date or start_date
+        use_date2 = date2 or trade_date or end_date
+
+        params: Dict[str, Any] = dict(kwargs)
+        if use_date1:
+            params["date1"] = use_date1
+        if use_date2:
+            params["date2"] = use_date2
+
+        data = self._query(f"open/kline/d/{normalized_symbol}", params=params)
+        df = kline_data_to_df(data)
+
+        if df.empty:
+            default_columns = [
+                "ts_code", "trade_date", "open", "high", "low", "close",
+                "pre_close", "change", "pct_chg", "vol", "amount"
+            ]
+            return df.reindex(columns=default_columns)
+
+        df["ts_code"] = self._to_tushare_ts_code(use_code)
+        ordered_columns = [
+            "ts_code", "trade_date", "open", "high", "low", "close",
+            "pre_close", "change", "pct_chg", "vol", "amount"
+        ]
+        df = df[[col for col in ordered_columns if col in df.columns]]
+        df = df.sort_values(by="trade_date", ascending=False).reset_index(drop=True)
+
+        if fields:
+            requested_fields = [field.strip() for field in fields.split(",") if field.strip()]
+            selected_fields = [field for field in requested_fields if field in df.columns]
+            if selected_fields:
+                return df[selected_fields]
+            return df.iloc[:, 0:0]
+
+        return df
+
+    def stock_basic(
+        self,
+        ts_code: Optional[str] = None,
+        exchange: Optional[str] = None,
+        list_status: str = "L",
+        is_hs: Optional[str] = None,
+        fields: Optional[str] = None,
+        name: Optional[str] = None,
+        **kwargs: Any
+    ):
+        requested_status = (list_status or "L").upper()
+        if requested_status not in {"L", "D", "P"}:
+            raise ValueError("list_status 仅支持 L/D/P")
+
+        backend_exchange = self._to_backend_exchange(exchange)
+        if exchange and backend_exchange is None:
+            raise ValueError("exchange 仅支持 SSE/SZSE/BSE/SH/SZ/BJ/GEM/KSH/STAR/SS/ALL")
+
+        if requested_status == "P":
+            df_empty = pd.DataFrame(columns=[
+                "ts_code", "symbol", "name", "area", "industry", "fullname", "enname",
+                "cnspell", "market", "exchange", "curr_type", "list_status",
+                "list_date", "delist_date", "is_hs"
+            ])
+            if fields:
+                requested_fields = [field.strip() for field in fields.split(",") if field.strip()]
+                selected_fields = [field for field in requested_fields if field in df_empty.columns]
+                if selected_fields:
+                    return df_empty[selected_fields]
+                return df_empty.iloc[:, 0:0]
+            return df_empty
+
+        query_status = requested_status if requested_status in {"L", "D"} else "ALL"
+        exchange_list = [backend_exchange] if backend_exchange else ["SS", "KSH", "SZ", "GEM", "BJ"]
+        rows: List[Dict[str, Any]] = []
+        for ex in exchange_list:
+            data = self._query(
+                "v3/open/stocks/list",
+                params={
+                    "exchange": ex,
+                    "list_status": query_status,
+                    "format": "records"
+                }
+            )
+            if isinstance(data, dict):
+                batch = data.get("list") or []
+                if isinstance(batch, list):
+                    rows.extend(batch)
+
+        normalized_codes: Optional[List[str]] = None
+        if ts_code:
+            normalized_codes = [self._normalize_symbol(item.strip()) for item in ts_code.split(",") if item.strip()]
+
+        result_rows: List[Dict[str, Any]] = []
+        for row in rows:
+            code = str(row.get("code", "")).strip()
+            if not code:
+                continue
+            if normalized_codes is not None and code not in normalized_codes:
+                continue
+            row_name = str(row.get("name", "")).strip()
+            if name and name not in row_name:
+                continue
+
+            ex_name = self._to_tushare_exchange(code)
+            type_code = str(row.get("type_code", "")).upper()
+            market_name = "创业板" if type_code == "GEM" else "科创板" if "KSH" in type_code else ""
+            result_rows.append({
+                "ts_code": self._to_tushare_ts_code(code),
+                "symbol": code,
+                "name": row_name,
+                "area": "",
+                "industry": "",
+                "fullname": row_name,
+                "enname": "",
+                "cnspell": "",
+                "market": market_name,
+                "exchange": ex_name,
+                "curr_type": "CNY",
+                "list_status": str(row.get("list_status", query_status)).upper(),
+                "list_date": "",
+                "delist_date": "",
+                "is_hs": "",
+            })
+
+        df = pd.DataFrame(result_rows)
+        ordered_columns = [
+            "ts_code", "symbol", "name", "area", "industry", "fullname", "enname",
+            "cnspell", "market", "exchange", "curr_type", "list_status",
+            "list_date", "delist_date", "is_hs"
+        ]
+        if df.empty:
+            df = pd.DataFrame(columns=ordered_columns)
+        else:
+            df = df[ordered_columns].drop_duplicates(subset=["ts_code"]).reset_index(drop=True)
+
+        if is_hs:
+            flag = is_hs.upper()
+            if flag in {"H", "S"}:
+                df = df.iloc[0:0]
+
+        if fields:
+            requested_fields = [field.strip() for field in fields.split(",") if field.strip()]
+            selected_fields = [field for field in requested_fields if field in df.columns]
+            if selected_fields:
+                return df[selected_fields]
+            return df.iloc[:, 0:0]
+
+        return df
