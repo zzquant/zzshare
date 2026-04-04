@@ -181,6 +181,9 @@ df = api.daily(
     end_date='20260203',
     adj='qfq'
 )
+# 获取全市场某交易日的所有股票数据（分页）
+df = api.daily(trade_date='20260331',offset=0, limit=10)
+
 ```
 
 `daily` 接口返回的字段说明：
