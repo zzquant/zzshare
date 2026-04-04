@@ -25,6 +25,13 @@
 
 ## 📦 安装
 
+**推荐安装方式（通过 PyPI）**：
+
+```bash
+pip install zzshare
+```
+**高级安装选项**：
+如果你想体验最新的开发版本（可能包含未发布的特性）：
 ```bash
 pip install git+https://github.com/zzquant/zzshare.git
 ```
