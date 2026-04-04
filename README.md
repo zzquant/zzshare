@@ -30,8 +30,12 @@
 ```bash
 pip install zzshare
 ```
-**高级安装选项**：
+
+<details>
+<summary><b>高级安装选项</b></summary>
+
 如果你想体验最新的开发版本（可能包含未发布的特性）：
+
 ```bash
 pip install git+https://github.com/zzquant/zzshare.git
 ```
@@ -43,6 +47,8 @@ git clone https://github.com/zzquant/zzshare.git
 cd zzshare
 pip install -e .
 ```
+
+</details>
 
 ***
 
