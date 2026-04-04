@@ -143,6 +143,73 @@ df_all = api.stock_basic(
 - `D`：退市
 - `P`：上市暂停（当前返回空表，但保留 tushare 兼容字段）
 
+### 日线行情（tushare 兼容）
+
+```python
+# 获取单只股票的日线数据（指定日期范围）
+df = api.daily(
+    ts_code='600871.SH',
+    start_date='20260201',
+    end_date='20260203'
+)
+
+# 获取单只股票的日线数据（指定单个交易日）
+df = api.daily(
+    ts_code='600871.SH',
+    trade_date='20260203'
+)
+
+# 获取全市场某交易日的所有股票数据（分页）
+df = api.daily(
+    trade_date='20260203',
+    offset=0,
+    limit=10
+)
+
+# 指定返回字段
+df = api.daily(
+    ts_code='600871.SH',
+    start_date='20260201',
+    end_date='20260203',
+    fields='ts_code,trade_date,open,high,low,close,pct_chg,vol,amount'
+)
+
+# 使用复权参数（adj='qfq' 前复权，adj='hfq' 后复权）
+df = api.daily(
+    ts_code='600871.SH',
+    start_date='20260101',
+    end_date='20260203',
+    adj='qfq'
+)
+```
+
+`daily` 接口返回的字段说明：
+
+| 字段名 | 说明 |
+| :--- | :--- |
+| `ts_code` | 股票代码（格式：600871.SH） |
+| `trade_date` | 交易日期（格式：20260203） |
+| `open` | 开盘价 |
+| `high` | 最高价 |
+| `low` | 最低价 |
+| `close` | 收盘价 |
+| `pre_close` | 昨收价 |
+| `change` | 涨跌额 |
+| `pct_chg` | 涨跌幅（%） |
+| `vol` | 成交量（手） |
+| `amount` | 成交额（千元） |
+
+`daily` 接口参数说明：
+
+- `ts_code`：股票代码，格式如 `600871.SH` 或 `000001.SZ`。为空时查询全市场数据
+- `trade_date`：交易日期，格式如 `20260203`。当 `ts_code` 为空时必填
+- `start_date`：起始日期，格式如 `20260201`
+- `end_date`：结束日期，格式如 `20260203`
+- `offset`：偏移量，用于分页
+- `limit`：返回记录数，用于分页
+- `fields`：指定返回字段，如 `ts_code,trade_date,close,pct_chg`
+- `adj`：复权类型，`qfq` 前复权，`hfq` 后复权，默认不复权
+
 ### 涨停复盘
 
 ```python
@@ -265,9 +332,9 @@ real = api.market_real(symbols='000001,000002,000003')
 
 ### K线数据
 
-| 方法名     | 描述   | 参数                       | 返回        |
-| :------ | :--- | :----------------------- | :-------- |
-| `daily` | 日线行情 | `code`, `date1`, `date2` | DataFrame |
+| 方法名     | 描述   | 参数                                                                 | 返回        |
+| :------ | :--- | :----------------------------------------------------------------- | :-------- |
+| `daily` | 日线行情（tushare 兼容） | `ts_code`, `trade_date`, `start_date`, `end_date`, `offset`, `limit`, `fields`, `adj` | DataFrame |
 
 ### 热度数据
 

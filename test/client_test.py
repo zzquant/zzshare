@@ -107,7 +107,11 @@ class DataApiTest(unittest.TestCase):
         self._call_api_method("trade_days", days=3)
 
     def test_kline_daily(self):
-        self._call_api_method("daily", code="600871", date1="2026-02-01", date2="2026-02-03")
+        self._call_api_method("daily", ts_code="600871.SH", start_date="20260201", end_date="20260203")
+
+    def test_kline_daily_all_by_trade_date(self):
+        result = self._call_api_method("daily", trade_date="20260203", limit=5, fields="ts_code,trade_date,open,close")
+        assert "ts_code" in result.columns
 
     def test_sentiment_market_hot_day(self):
         self._call_api_method("sentiment_market_hot_day", date="2026-02-03")
@@ -147,6 +151,24 @@ class DataApiTest(unittest.TestCase):
 
     def test_stock_info_basic(self):
         self._call_api_method("stock_info", stock_id="600871", info_type=1)
+
+    def test_stock_basic_default(self):
+        result = self._call_api_method("stock_basic")
+        assert "ts_code" in result.columns
+        assert "symbol" in result.columns
+        assert "name" in result.columns
+
+    def test_stock_basic_with_ts_code(self):
+        result = self._call_api_method("stock_basic", ts_code="600871.SH")
+        assert len(result) > 0
+        assert result.iloc[0]["ts_code"] == "600871.SH"
+
+    def test_stock_basic_with_fields(self):
+        result = self._call_api_method("stock_basic", ts_code="600871.SH", fields="ts_code,name,exchange")
+        assert "ts_code" in result.columns
+        assert "name" in result.columns
+        assert "exchange" in result.columns
+        assert len(result.columns) == 3
 
 
 if __name__ == "__main__":

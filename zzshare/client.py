@@ -1,6 +1,5 @@
-from functools import partial
 import requests
-from typing import Any, Optional, Dict, Callable, List, Tuple, Union
+from typing import Any, Optional, Dict, Callable, List, Union
 import pandas as pd
 
 from zzshare.core import BaseDataApi
@@ -333,27 +332,94 @@ class DataApi(BaseDataApi):
         trade_date: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
-        code: Optional[str] = None,
-        date1: Optional[str] = None,
-        date2: Optional[str] = None,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
         fields: Optional[str] = None,
         **kwargs: Any
     ):
-        use_code = ts_code or code
-        if not use_code:
-            raise ValueError("ts_code 或 code 不能为空")
-        normalized_symbol = self._normalize_symbol(use_code)
-        use_date1 = date1 or trade_date or start_date
-        use_date2 = date2 or trade_date or end_date
+        use_ts_code = self._to_tushare_ts_code(ts_code) if ts_code else None
+        normalized_trade_date = trade_date.replace("-", "") if trade_date else None
+        normalized_start = start_date.replace("-", "") if start_date else None
+        normalized_end = end_date.replace("-", "") if end_date else None
+        params: Dict[str, Any] = {}
+        adj = str(kwargs.pop("adj", "")).lower()
+        candle_mode = kwargs.pop("candle_mode", None)
+        if candle_mode is None:
+            if adj == "qfq":
+                candle_mode = 1
+            elif adj == "hfq":
+                candle_mode = 2
+            else:
+                candle_mode = 0
+        params["candle_mode"] = candle_mode
 
-        params: Dict[str, Any] = dict(kwargs)
-        if use_date1:
-            params["date1"] = use_date1
-        if use_date2:
-            params["date2"] = use_date2
+        if not use_ts_code:
+            if not normalized_trade_date:
+                raise ValueError("当 ts_code 为空时，trade_date 不能为空")
+            params["trade_date"] = normalized_trade_date
+            if offset is not None:
+                params["offset"] = offset
+            if limit is not None:
+                params["limit"] = limit
+            url = f"{self.http_url}/v3/market/kline/day"
+        else:
+            if normalized_trade_date:
+                params["get_type"] = "range"
+                params["start_date"] = normalized_trade_date
+                params["end_date"] = normalized_trade_date
+            else:
+                params["get_type"] = "range"
+                if normalized_start:
+                    params["start_date"] = normalized_start
+                if normalized_end:
+                    params["end_date"] = normalized_end
+            url = f"{self.http_url}/v3/market/kline/day/{use_ts_code}"
 
-        data = self._query(f"open/kline/d/{normalized_symbol}", params=params)
-        df = kline_data_to_df(data)
+        params.update(kwargs)
+        data: Optional[Union[Dict[str, Any], List[Any]]] = None
+        try:
+            res = requests.get(url, params=params, headers=self.headers, timeout=self.timeout)
+            if res.status_code == 200:
+                body = res.json()
+                if isinstance(body, dict):
+                    if body.get("code") == 200:
+                        data = body.get("data")
+                    elif "data" in body:
+                        data = body.get("data")
+                    else:
+                        data = body
+        except Exception:
+            data = None
+        records: List[Dict[str, Any]] = []
+        data_ts_code: Optional[str] = None
+        if isinstance(data, list):
+            records = [item for item in data if isinstance(item, dict)]
+        elif isinstance(data, dict):
+            data_ts_code = data.get("ts_code")
+            list_data = data.get("list")
+            if isinstance(list_data, list):
+                records = [item for item in list_data if isinstance(item, dict)]
+
+        if records:
+            normalized_rows: List[Dict[str, Any]] = []
+            for row in records:
+                row_ts_code = row.get("ts_code") or row.get("symbol") or row.get("code") or data_ts_code or use_ts_code
+                normalized_rows.append({
+                    "ts_code": self._to_tushare_ts_code(str(row_ts_code)) if row_ts_code else None,
+                    "trade_date": str(row.get("trade_date") or row.get("date") or row.get("day") or "").replace("-", ""),
+                    "open": row.get("open", row.get("o")),
+                    "high": row.get("high", row.get("h")),
+                    "low": row.get("low", row.get("l")),
+                    "close": row.get("close", row.get("c")),
+                    "pre_close": row.get("pre_close", row.get("prev_close")),
+                    "change": row.get("change"),
+                    "pct_chg": row.get("pct_chg", row.get("pct_change", row.get("quote_rate"))),
+                    "vol": row.get("vol", row.get("volume")),
+                    "amount": row.get("amount", row.get("turnover")),
+                })
+            df = pd.DataFrame(normalized_rows)
+        else:
+            df = pd.DataFrame()
 
         if df.empty:
             default_columns = [
@@ -362,13 +428,36 @@ class DataApi(BaseDataApi):
             ]
             return df.reindex(columns=default_columns)
 
-        df["ts_code"] = self._to_tushare_ts_code(use_code)
+        if "ts_code" not in df.columns:
+            df["ts_code"] = use_ts_code
+        else:
+            df["ts_code"] = df["ts_code"].apply(lambda x: self._to_tushare_ts_code(str(x)) if pd.notna(x) and str(x) else "")
+        if "trade_date" in df.columns:
+            df["trade_date"] = df["trade_date"].astype(str).str.replace("-", "", regex=False)
+        numeric_columns = ["open", "high", "low", "close", "pre_close", "change", "pct_chg", "vol", "amount"]
+        for col in numeric_columns:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+        if "change" in df.columns and "pre_close" in df.columns and "close" in df.columns:
+            missing_change = df["change"].isna()
+            df.loc[missing_change, "change"] = df.loc[missing_change, "close"] - df.loc[missing_change, "pre_close"]
+        if "pct_chg" in df.columns and "change" in df.columns and "pre_close" in df.columns:
+            missing_pct = df["pct_chg"].isna()
+            valid_pre_close = df["pre_close"] != 0
+            fill_mask = missing_pct & valid_pre_close
+            df.loc[fill_mask, "pct_chg"] = (df.loc[fill_mask, "change"] / df.loc[fill_mask, "pre_close"]) * 100
+
         ordered_columns = [
             "ts_code", "trade_date", "open", "high", "low", "close",
             "pre_close", "change", "pct_chg", "vol", "amount"
         ]
-        df = df[[col for col in ordered_columns if col in df.columns]]
+        df = df.reindex(columns=ordered_columns)
         df = df.sort_values(by="trade_date", ascending=False).reset_index(drop=True)
+        if use_ts_code:
+            if offset is not None:
+                df = df.iloc[offset:]
+            if limit is not None:
+                df = df.head(limit)
 
         if fields:
             requested_fields = [field.strip() for field in fields.split(",") if field.strip()]

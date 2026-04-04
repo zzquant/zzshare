@@ -19,24 +19,22 @@ def _get_default_api() -> DataApi:
 
 
 def daily(
-    code: Optional[str] = None,
-    trade_date: Optional[str] = None,
     ts_code: Optional[str] = None,
+    trade_date: Optional[str] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
-    date1: Optional[str] = None,
-    date2: Optional[str] = None,
+    offset: Optional[int] = None,
+    limit: Optional[int] = None,
     fields: Optional[str] = None,
     **kwargs: Any,
 ):
     return _get_default_api().daily(
-        code=code,
         ts_code=ts_code,
         trade_date=trade_date,
         start_date=start_date,
         end_date=end_date,
-        date1=date1,
-        date2=date2,
+        offset=offset,
+        limit=limit,
         fields=fields,
         **kwargs,
     )

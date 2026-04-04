@@ -76,9 +76,8 @@ class DataApi:
         trade_date: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
-        code: Optional[str] = None,
-        date1: Optional[str] = None,
-        date2: Optional[str] = None,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
         fields: Optional[str] = None,
         **kwargs: Any
     ) -> DataFrame: ...
