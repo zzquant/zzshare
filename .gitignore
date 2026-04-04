@@ -1,11 +1,29 @@
+# 字节码缓存 (对应图里的 __pycache__)
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
+*.py[cod]
+*$py.class
+
+# Pytest 缓存 (对应图里的 .pytest_cache)
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 打包构建目录 (对应图里的 zzshare.egg-info)
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# 虚拟环境 (如果你以后在本地建了虚拟环境)
 venv/
+env/
 .env
-.DS_Store
-.idea/
+
+# IDE 配置文件 (比如 VS Code 或 PyCharm 的配置)
 .vscode/
+.idea/
+
+# 其他
+.Python
+.DS_Store
+

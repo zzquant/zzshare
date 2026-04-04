@@ -5,17 +5,36 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "zzshare"
 version = "0.1.2"
-description = "A股量化数据接口 SDK"
+description = "A股量化数据接口 SDK - 免费、开箱即用的量化数据接口"
 readme = "README.md"
 requires-python = ">=3.8"
-license = { text = "MIT" }
 authors = [
   { name = "zzquant" }
+]
+keywords = ["stock", "quant", "finance", "tushare", "china", "a-share", "kline", "market-data"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Topic :: Office/Business :: Financial",
+  "Topic :: Office/Business :: Financial :: Investment",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
 ]
 dependencies = [
   "requests>=2.25.0",
   "pandas>=1.3.0"
 ]
+
+[project.urls]
+Homepage = "https://github.com/zzquant/zzshare"
+Repository = "https://github.com/zzquant/zzshare"
+Issues = "https://github.com/zzquant/zzshare/issues"
 
 [tool.setuptools]
 include-package-data = true

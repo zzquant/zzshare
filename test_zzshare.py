@@ -24,6 +24,9 @@ print(df)
 df = api.daily(trade_date='20260331',limit=10)
 print(df)
 
+df = api.daily(trade_date='20260331',limit=10, fields='ts_code,open,close,high,low,volume,amount,adjustflag,turnoverrate')
+print(df)
+
 basic = api.stock_basic(exchange='', list_status='L', fields='ts_code,symbol,name,exchange,list_status')
 print(basic)
 

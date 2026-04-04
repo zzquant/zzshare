@@ -1,0 +1,36 @@
+name: Publish zzshare to PyPI
+
+# 这里配置触发条件。推荐的常见做法是：当你打上 v1.0.0 这样的 Tag 时触发
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-publish:
+    name: Build and publish to PyPI
+    runs-on: ubuntu-latest
+    
+    # 【最核心配置】：必须开启 id-token: write 权限，PyPI 才能通过 OIDC 认出这是你的仓库
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10" # 可以改成你习惯的 Python 版本
+
+    - name: Install build tools
+      run: python -m pip install --upgrade pip build
+
+    - name: Build a binary wheel and a source tarball
+      run: python -m build
+
+    - name: Publish package to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      # 注意：这里不需要配置任何 password 或 token，它会自动走 OIDC 认证
