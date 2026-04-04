@@ -7,5 +7,18 @@ api = DataApi()
 df = api.daily(ts_code='920978.BJ', start_date='20250101', end_date='20250131')
 print(df)
 
+df = api.daily(ts_code='000001', start_date='20260302', end_date='20260331')
+print(df)
+
+df = api.daily(
+    ts_code='600871',
+    start_date='20260101',
+    end_date='20260203',
+    adj='qfq'
+)
+print(df)
+
 basic = api.stock_basic(exchange='', list_status='L', fields='ts_code,symbol,name,exchange,list_status')
 print(basic)
+
+

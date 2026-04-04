@@ -49,7 +49,7 @@ from zzshare.client import DataApi
 api = DataApi()
 
 # 获取日线行情
-df = api.daily(code='000001', date1='20250101', date2='20250131')
+df = api.daily(ts_code='000001', start_date='20260302', end_date='20260331')
 print(df)
 ```
 
