@@ -50,6 +50,11 @@ pip install -e .
 
 </details>
 
+## 更新
+```bash
+pip install zzshare --upgrade
+```
+
 ***
 
 ## 🚀 快速开始
@@ -93,7 +98,8 @@ basic = api.stock_basic(exchange='SSE', list_status='L', fields='ts_code,symbol,
 
 | 分类       | 接口                                                     | 描述                           |
 | :------- | :----------------------------------------------------- | :--------------------------- |
-| **日线数据** | `daily`                                                | 个股日K线，返回 DataFrame           |
+| **日线数据** | `daily`                                                | 个股日K线，返回 DataFrame |
+| **分时数据** | `stk_mins`                                             | 个股分钟K线，返回 DataFrame |
 | **涨停复盘** | `uplimit_hot` `uplimit_stocks`                         | 涨停热门板块、涨停股票                  |
 | **涨停原因** | `stock_uplimit_reason` `review_uplimit_reason`         | 个股/全市场涨停原因                   |
 | **龙虎榜**  | `lhb_list` `lhb_detail` `lhb_stock_history`            | 龙虎榜列表、详情、历史                  |
@@ -109,7 +115,7 @@ basic = api.stock_basic(exchange='SSE', list_status='L', fields='ts_code,symbol,
 
 ## 📖 使用示例
 
-### 股票基础信息（tushare 兼容）
+### 股票基础信息（兼容）
 
 ```python
 # 获取上交所在市股票（默认 list_status='L'）
@@ -156,7 +162,7 @@ df_all = api.stock_basic(
 - `D`：退市
 - `P`：上市暂停（当前返回空表，但保留 tushare 兼容字段）
 
-### 日线行情（tushare 兼容）
+### 日线行情（兼容）
 
 ```python
 # 获取单只股票的日线数据（指定日期范围）
@@ -199,6 +205,8 @@ df = api.daily(trade_date='20260331',offset=0, limit=10)
 
 ```
 
+
+
 `daily` 接口返回的字段说明：
 
 | 字段名 | 说明 |
@@ -225,6 +233,67 @@ df = api.daily(trade_date='20260331',offset=0, limit=10)
 - `limit`：返回记录数，用于分页
 - `fields`：指定返回字段，如 `ts_code,trade_date,close,pct_chg`
 - `adj`：复权类型，`qfq` 前复权，`hfq` 后复权，默认不复权
+
+### 分钟K线（兼容）
+
+```python
+# 获取某日1分钟K线
+df = api.stk_mins(
+    ts_code='000001',
+    trade_time='20250403',
+    freq='1min'
+)
+
+# 获取某日5分钟K线
+df = api.stk_mins(
+    ts_code='600000.SH',
+    trade_time='20250403',
+    freq='5min'
+)
+
+# 按时间区间查询
+df = api.stk_mins(
+    ts_code='000001',
+    start_time='20250403 09:30:00',
+    end_time='20250403 10:00:00',
+    freq='1min'
+)
+
+# 指定时间点查询（从该时间点开始获取）
+df = api.stk_mins(
+    ts_code='000001',
+    trade_time='20250403 14:30:00',
+    freq='1min'
+)
+```
+
+`stk_mins` 接口返回的字段说明：
+
+| 字段名 | 说明 |
+| :--- | :--- |
+| `ts_code` | 股票代码（格式：600871.SH） |
+| `trade_time` | 交易时间（格式：202504031430） |
+| `open` | 开盘价 |
+| `high` | 最高价 |
+| `low` | 最低价 |
+| `close` | 收盘价 |
+| `vol` | 成交量（手） |
+| `amount` | 成交额（千元） |
+
+`stk_mins` 接口参数说明：
+
+- `ts_code`：股票代码，格式如 `600871.SH` 或 `000001.SZ`（必填）
+- `freq`：行情频率，支持 `1min`/`5min`/`15min`/`30min`/`60min`，默认 `1min`
+- `trade_time`：交易时间，格式如 `20250403` 或 `20250403 14:30:00`
+- `start_time`：开始时间，格式如 `20250403 09:30:00`
+- `end_time`：结束时间，格式如 `20250403 15:00:00`
+
+**查询方式说明**：
+
+1. **按单日查询**：传入 `trade_time='20250403'`，返回该日全天数据
+2. **按时间区间查询**：传入 `start_time` 和 `end_time`，返回区间内数据
+3. **按时间点查询**：传入 `trade_time='20250403 14:30:00'`，从该时间点开始获取
+
 
 ### 涨停复盘
 
@@ -348,9 +417,10 @@ real = api.market_real(symbols='000001,000002,000003')
 
 ### K线数据
 
-| 方法名     | 描述   | 参数                                                                 | 返回        |
-| :------ | :--- | :----------------------------------------------------------------- | :-------- |
-| `daily` | 日线行情（tushare 兼容） | `ts_code`, `trade_date`, `start_date`, `end_date`, `offset`, `limit`, `fields`, `adj` | DataFrame |
+| 方法名       | 描述                     | 参数                                                                                              | 返回        |
+| :-------- | :--------------------- | :---------------------------------------------------------------------------------------- | :-------- |
+| `daily`   | 日线行情（tushare 兼容）   | `ts_code`, `trade_date`, `start_date`, `end_date`, `offset`, `limit`, `fields`, `adj`                          | DataFrame |
+| `stk_mins` | 分钟K线（tushare 兼容） | `ts_code`, `freq`, `trade_time`, `start_time`, `end_time`                                                | DataFrame |
 
 ### 热度数据
 

@@ -468,6 +468,98 @@ class DataApi(BaseDataApi):
 
         return df
 
+    def stk_mins(
+        self,
+        ts_code: Optional[str] = None,
+        trade_time: Optional[str] = None,
+        start_time: Optional[str] = None,
+        end_time: Optional[str] = None,
+        freq: str = "1min",
+        **kwargs: Any
+    ):
+        use_ts_code = self._to_tushare_ts_code(ts_code) if ts_code else None
+        if not use_ts_code:
+            raise ValueError("ts_code 不能为空")
+
+        params: Dict[str, Any] = {}
+        params["freq"] = freq
+
+        if trade_time:
+            params["trade_time"] = trade_time
+        if start_time:
+            params["start_time"] = start_time
+        if end_time:
+            params["end_time"] = end_time
+
+        params.update(kwargs)
+        url = f"{self.http_url}/v3/market/kline/minute/{use_ts_code}"
+
+        data: Optional[Union[Dict[str, Any], List[Any]]] = None
+        try:
+            res = requests.get(url, params=params, headers=self.headers, timeout=self.timeout)
+            if res.status_code == 200:
+                body = res.json()
+                if isinstance(body, dict):
+                    if body.get("code") == 200:
+                        data = body.get("data")
+                    elif "data" in body:
+                        data = body.get("data")
+                    else:
+                        data = body
+        except Exception:
+            data = None
+
+        records: List[Dict[str, Any]] = []
+        if isinstance(data, list):
+            records = [item for item in data if isinstance(item, dict)]
+        elif isinstance(data, dict):
+            list_data = data.get("list")
+            if isinstance(list_data, list):
+                records = [item for item in list_data if isinstance(item, dict)]
+
+        if records:
+            normalized_rows: List[Dict[str, Any]] = []
+            for row in records:
+                row_ts_code = row.get("code") or row.get("ts_code") or use_ts_code
+                trade_time_str = row.get("trade_time", "")
+                normalized_rows.append({
+                    "ts_code": self._to_tushare_ts_code(str(row_ts_code)) if row_ts_code else None,
+                    "trade_time": trade_time_str,
+                    "open": row.get("open"),
+                    "high": row.get("high"),
+                    "low": row.get("low"),
+                    "close": row.get("close"),
+                    "vol": row.get("vol"),
+                    "amount": row.get("amount"),
+                })
+            df = pd.DataFrame(normalized_rows)
+        else:
+            df = pd.DataFrame()
+
+        if df.empty:
+            default_columns = [
+                "ts_code", "trade_time", "open", "high", "low", "close", "vol", "amount"
+            ]
+            return df.reindex(columns=default_columns)
+
+        if "ts_code" not in df.columns:
+            df["ts_code"] = use_ts_code
+        else:
+            df["ts_code"] = df["ts_code"].apply(lambda x: self._to_tushare_ts_code(str(x)) if pd.notna(x) and str(x) else "")
+
+        numeric_columns = ["open", "high", "low", "close", "vol", "amount"]
+        for col in numeric_columns:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        ordered_columns = [
+            "ts_code", "trade_time", "open", "high", "low", "close", "vol", "amount"
+        ]
+        df = df.reindex(columns=ordered_columns)
+        df = df.sort_values(by="trade_time", ascending=False).reset_index(drop=True)
+
+        return df
+
     def stock_basic(
         self,
         ts_code: Optional[str] = None,

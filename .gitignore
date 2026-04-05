@@ -26,4 +26,4 @@ env/
 # 其他
 .Python
 .DS_Store
-
+test*.py
