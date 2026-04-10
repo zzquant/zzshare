@@ -51,6 +51,7 @@ pip install -e .
 </details>
 
 ## 更新
+
 ```bash
 pip install zzshare --upgrade
 ```
@@ -162,7 +163,10 @@ df_all = api.stock_basic(
 - `D`：退市
 - `P`：上市暂停（当前返回空表，但保留 tushare 兼容字段）
 
-### 日线行情（兼容）
+### 历史日线行情（兼容）
+
+- 数据说明：交易日收盘后提供(沪深京)
+- 全量字段中有复权因子,方便量化用户导出数据。
 
 ```python
 # 获取单只股票的日线数据（指定日期范围）
@@ -205,8 +209,6 @@ df = api.daily(trade_date='20260331',offset=0, limit=10)
 
 ```
 
-
-
 `daily` 接口返回的字段说明：
 
 | 字段名 | 说明 |
@@ -231,8 +233,21 @@ df = api.daily(trade_date='20260331',offset=0, limit=10)
 - `end_date`：结束日期，格式如 `20260203`
 - `offset`：偏移量，用于分页
 - `limit`：返回记录数，用于分页
-- `fields`：指定返回字段，如 `ts_code,trade_date,close,pct_chg`
+- `fields`：指定返回字段，如 `ts_code,trade_date,close,pct_chg`。传入 `'all'` 可返回以下所述的原始底层全量字段
 - `adj`：复权类型，`qfq` 前复权，`hfq` 后复权，默认不复权
+- `export_all`：设为 `True` 时直接返回更多的 18 个全量字段模式
+
+> ✨ **全量字段模式说明**：
+>
+> 为了最大化兼容，默认仅返回上表的 11 种核心字段。
+> 但如果您传入 `fields='all'` 或 `export_all=True` 参数，接口将返回 **全部 18 个字段**，以供高阶量化计算所需（需要注意：全量模式下底层原生的 `volume`/`turnover`/`quote_rate` 名字会直接替代缩写版的 `vol`/`amount`/`pct_chg`）。全量模式补充的特殊字段如下：
+>
+> - `factor`：复权因子
+> - `avg_price`：日内均价
+> - `high_limit` / `low_limit`：涨停价 / 跌停价
+> - `turnover_rate`：换手率
+> - `amp_rate`：振幅
+> - `is_paused` / `is_st`：是否停牌 / 是否 ST
 
 ### 分钟K线（兼容）
 
@@ -293,7 +308,6 @@ df = api.stk_mins(
 1. **按单日查询**：传入 `trade_time='20250403'`，返回该日全天数据
 2. **按时间区间查询**：传入 `start_time` 和 `end_time`，返回区间内数据
 3. **按时间点查询**：传入 `trade_time='20250403 14:30:00'`，从该时间点开始获取
-
 
 ### 涨停复盘
 

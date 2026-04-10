@@ -416,17 +416,40 @@ class DataApi(BaseDataApi):
                     "pct_chg": row.get("pct_chg", row.get("pct_change", row.get("quote_rate"))),
                     "vol": row.get("vol", row.get("volume")),
                     "amount": row.get("amount", row.get("turnover")),
+                    "volume": row.get("volume", row.get("vol")),
+                    "turnover": row.get("turnover", row.get("amount")),
+                    "factor": row.get("factor"),
+                    "prev_close": row.get("prev_close", row.get("pre_close")),
+                    "avg_price": row.get("avg_price"),
+                    "high_limit": row.get("high_limit"),
+                    "low_limit": row.get("low_limit"),
+                    "turnover_rate": row.get("turnover_rate"),
+                    "amp_rate": row.get("amp_rate"),
+                    "quote_rate": row.get("quote_rate", row.get("pct_chg", row.get("pct_change"))),
+                    "is_paused": row.get("is_paused"),
+                    "is_st": row.get("is_st"),
                 })
             df = pd.DataFrame(normalized_rows)
         else:
             df = pd.DataFrame()
 
+        export_all = str(kwargs.get("export_all", "")).lower() in ["true", "1", "yes"]
+        all_import_columns = [
+            "ts_code", "trade_date", "open", "high", "low", "close",
+            "volume", "turnover", "factor", "prev_close", "avg_price",
+            "high_limit", "low_limit", "turnover_rate", "amp_rate",
+            "quote_rate", "is_paused", "is_st"
+        ]
+
         if df.empty:
-            default_columns = [
-                "ts_code", "trade_date", "open", "high", "low", "close",
-                "pre_close", "change", "pct_chg", "vol", "amount"
-            ]
-            return df.reindex(columns=default_columns)
+            if fields == "all" or export_all:
+                return pd.DataFrame(columns=all_import_columns)
+            else:
+                default_columns = [
+                    "ts_code", "trade_date", "open", "high", "low", "close",
+                    "pre_close", "change", "pct_chg", "vol", "amount"
+                ]
+                return df.reindex(columns=default_columns)
 
         if "ts_code" not in df.columns:
             df["ts_code"] = use_ts_code
@@ -434,7 +457,11 @@ class DataApi(BaseDataApi):
             df["ts_code"] = df["ts_code"].apply(lambda x: self._to_tushare_ts_code(str(x)) if pd.notna(x) and str(x) else "")
         if "trade_date" in df.columns:
             df["trade_date"] = df["trade_date"].astype(str).str.replace("-", "", regex=False)
-        numeric_columns = ["open", "high", "low", "close", "pre_close", "change", "pct_chg", "vol", "amount"]
+        numeric_columns = [
+            "open", "high", "low", "close", "pre_close", "change", "pct_chg", "vol", "amount",
+            "volume", "turnover", "factor", "prev_close", "avg_price", "high_limit", "low_limit",
+            "turnover_rate", "amp_rate", "quote_rate"
+        ]
         for col in numeric_columns:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -447,10 +474,19 @@ class DataApi(BaseDataApi):
             fill_mask = missing_pct & valid_pre_close
             df.loc[fill_mask, "pct_chg"] = (df.loc[fill_mask, "change"] / df.loc[fill_mask, "pre_close"]) * 100
 
-        ordered_columns = [
-            "ts_code", "trade_date", "open", "high", "low", "close",
-            "pre_close", "change", "pct_chg", "vol", "amount"
-        ]
+        if fields == "all" or export_all:
+            ordered_columns = all_import_columns
+        else:
+            ordered_columns = [
+                "ts_code", "trade_date", "open", "high", "low", "close",
+                "pre_close", "change", "pct_chg", "vol", "amount"
+            ]
+            if fields:
+                requested_fields = [field.strip() for field in fields.split(",") if field.strip()]
+                for f in requested_fields:
+                    if f in df.columns and f not in ordered_columns:
+                        ordered_columns.append(f)
+
         df = df.reindex(columns=ordered_columns)
         df = df.sort_values(by="trade_date", ascending=False).reset_index(drop=True)
         if use_ts_code:
@@ -459,7 +495,7 @@ class DataApi(BaseDataApi):
             if limit is not None:
                 df = df.head(limit)
 
-        if fields:
+        if fields and fields != "all":
             requested_fields = [field.strip() for field in fields.split(",") if field.strip()]
             selected_fields = [field for field in requested_fields if field in df.columns]
             if selected_fields:
