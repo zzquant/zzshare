@@ -188,11 +188,6 @@ class DataApi(BaseDataApi):
             None
         ),
         # 行情实时数据
-        "market_real": (
-            "open/market/real",
-            ["symbols"],
-            None
-        ),
         "stock_moneyflow": (
             "open/stock/{stock_id}/moneyflow",
             ["stock_id", "m_type"],

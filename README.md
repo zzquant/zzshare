@@ -108,7 +108,7 @@ basic = api.stock_basic(exchange='SSE', list_status='L', fields='ts_code,symbol,
 | **板块数据** | `plates_list` `plates_rank` `market_plate`             | 板块列表、排名、热门                   |
 | **情绪指标** | `market_sentiment` `sentiment_trend` `sentiment_level` | 市场情绪K线、趋势、级别                 |
 | **热度数据** | `ths_hot_top` `stock_ths_hot`                          | 同花顺热度排行、个股热度                 |
-| **实时行情** | `market_real` `stock_moneyflow`                        | 实时快照、资金流向                    |
+| **实时行情** | `stock_moneyflow`                                      | 资金流向                    |
 | **基础数据** | `trade_days` `stock_info` `stock_basic`                | 交易日历、个股信息、股票基础信息（tushare 兼容） |
 
 > 💡 共计 **40+** 个已实现接口，完整列表见下方。
@@ -224,8 +224,8 @@ df = api.daily(trade_date='20260331',offset=0, limit=10)
 | `pre_close` | 昨收价 |
 | `change` | 涨跌额 |
 | `pct_chg` | 涨跌幅（%） |
-| `vol` | 成交量（手） |
-| `amount` | 成交额（千元） |
+| `vol` | 成交量（股） |
+| `amount` | 成交额（元） |
 
 `daily` 接口参数说明：
 
@@ -299,8 +299,8 @@ df = api.rt_k(ts_code='000001.SZ', fields='all')
 | `open` | 开盘价 |
 | `low` | 最低价 |
 | `close` | 现价/实时收盘价 |
-| `vol` | 成交量 |
-| `amount` | 成交金额 |
+| `vol` | 成交量（股） |
+| `amount` | 成交金额（元） |
 | `num` | 成交笔数（若源不支持则返回 0） |
 | `ask_price1` | 卖一价 |
 | `ask_volume1` | 卖一量 |
@@ -359,8 +359,8 @@ df = api.stk_mins(
 | `high` | 最高价 |
 | `low` | 最低价 |
 | `close` | 收盘价 |
-| `vol` | 成交量（手） |
-| `amount` | 成交额（千元） |
+| `vol` | 成交量（股） |
+| `amount` | 成交额（元） |
 
 `stk_mins` 接口参数说明：
 
@@ -428,12 +428,6 @@ trend = api.sentiment_trend(model=1, date1='20250205')
 level = api.sentiment_level(date='20250205')
 ```
 
-### 实时数据
-
-```python
-# 获取多只股票实时行情
-real = api.market_real(symbols='000001,000002,000003')
-```
 
 ***
 
@@ -532,7 +526,6 @@ real = api.market_real(symbols='000001,000002,000003')
 
 | 方法名           | 描述     | 参数                                 |
 | :------------ | :----- | :--------------------------------- |
-| `market_real` | 行情实时快照 | `symbols`                          |
 | `market_mf`   | 资金流向分钟 | `stock`, `date`, `wm`, `default_v` |
 
 ### 其他

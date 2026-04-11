@@ -89,7 +89,7 @@ class DataApiTest(unittest.TestCase):
         self._call_api_method("stock_ths_hot", code="600519", date1="2026-02-03")
 
     def test_market_sentiment_hot_day(self):
-        self._call_api_method("market_sentiment_hot_day", date="2026-02-03")
+        self._call_api_method("sentiment_market_hot_day", date="2026-02-03")
 
     def test_market_style(self):
         self._call_api_method("market_style", date1="2026-02-03")
@@ -169,6 +169,31 @@ class DataApiTest(unittest.TestCase):
         assert "name" in result.columns
         assert "exchange" in result.columns
         assert len(result.columns) == 3
+
+    def test_rt_k_single(self):
+        result = self._call_api_method("rt_k", ts_code="000001.SZ")
+        assert "ts_code" in result.columns
+        assert result.iloc[0]["ts_code"] == "000001.SZ"
+
+    def test_rt_k_multiple(self):
+        result = self._call_api_method("rt_k", ts_code="000001.SZ,600000.SH")
+        assert len(result) >= 2
+        assert "000001.SZ" in result["ts_code"].values
+        assert "600000.SH" in result["ts_code"].values
+
+    def test_rt_k_wildcard(self):
+        # 测试沪市主板通配符
+        result = self._call_api_method("rt_k", ts_code="60*.SH")
+        assert len(result) > 0
+        for code in result["ts_code"]:
+            assert code.startswith("60") and code.endswith(".SH")
+
+    def test_rt_k_all_fields(self):
+        # 测试全量字段模式
+        result = self._call_api_method("rt_k", ts_code="000001.SZ", fields="all")
+        assert "high_limit" in result.columns
+        assert "turnover_rate" in result.columns
+        assert "auction_px" in result.columns
 
 
 if __name__ == "__main__":

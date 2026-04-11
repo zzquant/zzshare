@@ -70,6 +70,13 @@ class DataApi:
         date2: Optional[str] = None
     ) -> Any: ...
 
+    def rt_k(
+        self,
+        ts_code: str = '',
+        fields: Optional[str] = None,
+        **kwargs: Any
+    ) -> DataFrame: ...
+
     def daily(
         self,
         ts_code: Optional[str] = None,
@@ -79,6 +86,16 @@ class DataApi:
         offset: Optional[int] = None,
         limit: Optional[int] = None,
         fields: Optional[str] = None,
+        **kwargs: Any
+    ) -> DataFrame: ...
+
+    def stk_mins(
+        self,
+        ts_code: Optional[str] = None,
+        trade_time: Optional[str] = None,
+        start_time: Optional[str] = None,
+        end_time: Optional[str] = None,
+        freq: str = "1min",
         **kwargs: Any
     ) -> DataFrame: ...
 
@@ -217,8 +234,6 @@ class DataApi:
     ) -> Any: ...
     
     # 行情实时数据
-    def market_real(self, symbols: str) -> Any: ...
-    
     def stock_moneyflow(
         self,
         stock_id: str,
