@@ -15,10 +15,11 @@
 
 ## ✨ 特性
 
-- 🚀 **开箱即用** - 无需申请 Token，安装即可使用(极少数接口需要token)
-- 📊 **丰富数据** - 涨停复盘、龙虎榜、情绪指标、板块热度等 40+ 接口
+- 🚀 **开箱即用** - 无需申请，安装即可使用
+- 📅 **数据范围** - 行情数据2005年至今(20年+)，其他数据根据接口提供方数据为准。
+- 📊 **丰富数据** - 行情数据、涨停复盘、龙虎榜、情绪指标、板块热度等 40+ 接口
 - 🔄 **兼容 某些接口** - 接口规范兼容某些接口,比如tushare等，迁移成本低
-- ⚡ **实时数据** - 支持实时行情、资金流向等盘中数据
+- ⚡ **实时数据** - 支持日线、分钟线、资金流向等盘中实时数据
 - 🐍 **类型提示** - 完整的 `.pyi` 类型文件，IDE 自动补全
 
 ***
@@ -65,7 +66,7 @@ pip install zzshare --upgrade
 ```python
 from zzshare.client import DataApi
 
-# [可选]Token 可在官网个人资料页面获取(https://quant.zizizaizai.com/me/profile)
+# [可选,部分接口需要]Token 可在官网个人资料页面获取(https://quant.zizizaizai.com/me/profile)
 api = DataApi(token='your_api_token_here')
 
 # 获取日线行情
@@ -427,7 +428,6 @@ trend = api.sentiment_trend(model=1, date1='20250205')
 # 获取情绪级别
 level = api.sentiment_level(date='20250205')
 ```
-
 
 ***
 
