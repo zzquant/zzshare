@@ -326,6 +326,49 @@ class DataApi(BaseDataApi):
         }
         return mapping.get(exchange.upper())
 
+    def rt_k(self, ts_code: str = '', **kwargs: Any):
+        """
+        获取实时日线快照数据
+        :param ts_code: 股票代码（支持多个用逗号隔开，或使用 3*.SZ 这样的通配符）
+        :param fields: 当设为 'all' 时，返回扩展的高级量化字段。
+        """
+        params = {}
+        if ts_code:
+            params["ts_code"] = ts_code
+
+        url = f"{self.http_url}/v3/market/kline/realtime"
+        try:
+            response = requests.get(url, params=params, headers=self.headers, timeout=self.timeout)
+            response.raise_for_status()
+            data = response.json().get("data", {}).get("list", [])
+        except Exception as e:
+            print(f"Request Error: {e}")
+            data = []
+        df = pd.DataFrame(data)
+
+        base_cols = ['ts_code', 'name', 'pre_close', 'high', 'open', 'low', 'close', 'vol', 'amount', 'num', 'ask_price1', 'ask_volume1', 'bid_price1', 'bid_volume1']
+        if df.empty:
+            return pd.DataFrame(columns=base_cols)
+
+        # 转换数字类型
+        numeric_cols = [
+            'pre_close', 'open', 'high', 'low', 'close', 'vol', 'amount', 'num',
+            'ask_price1', 'ask_volume1', 'bid_price1', 'bid_volume1',
+            'quote_rate', 'high_limit', 'low_limit', 'turnover_rate', 'market_value', 'circulation_value',
+            'min5_chgpct', 'ttm_pe_rate', 'eps_ttm', 'auction_vol', 'auction_val', 'auction_px'
+        ]
+        for col in numeric_cols:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+
+        fields = kwargs.get("fields", "")
+        if fields == "all":
+            # 扩展模式
+            return df
+        else:
+            # 强兼容模式
+            return df[base_cols]
+
     def daily(
         self,
         ts_code: Optional[str] = None,

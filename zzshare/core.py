@@ -11,7 +11,8 @@ class BaseDataApi:
 
         self.headers = {}
         if self.token:
-            self.headers['Authorization'] = f'Bearer {self.token}'
+            # SDK 鉴权使用自定义请求头 sdk-key（非 Bearer Token）
+            self.headers['sdk-key'] = self.token
 
         # 注册快捷方法（在 __init__ 中自动注册）
         self._register_shortcuts()

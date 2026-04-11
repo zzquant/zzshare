@@ -15,9 +15,9 @@
 
 ## ✨ 特性
 
-- 🚀 **开箱即用** - 无需申请 Token，安装即可使用
+- 🚀 **开箱即用** - 无需申请 Token，安装即可使用(极少数接口需要token)
 - 📊 **丰富数据** - 涨停复盘、龙虎榜、情绪指标、板块热度等 40+ 接口
-- 🔄 **兼容 tushare** - 接口规范兼容 tushare pro，迁移成本低
+- 🔄 **兼容 某些接口** - 接口规范兼容某些接口,比如tushare等，迁移成本低
 - ⚡ **实时数据** - 支持实时行情、资金流向等盘中数据
 - 🐍 **类型提示** - 完整的 `.pyi` 类型文件，IDE 自动补全
 
@@ -60,15 +60,16 @@ pip install zzshare --upgrade
 
 ## 🚀 快速开始
 
-**3 行代码获取数据：**
+**使用 API Token 初始化：**
 
 ```python
 from zzshare.client import DataApi
 
-api = DataApi()
+# [可选]Token 可在官网个人资料页面获取(https://quant.zizizaizai.com/me/profile)
+api = DataApi(token='your_api_token_here')
 
 # 获取日线行情
-df = api.daily(ts_code='000001', start_date='20260302', end_date='20260331')
+df = api.daily(ts_code='000001.SZ', start_date='20260302', end_date='20260331')
 print(df)
 ```
 
@@ -167,6 +168,7 @@ df_all = api.stock_basic(
 
 - 数据说明：交易日收盘后提供(沪深京)
 - 全量字段中有复权因子,方便量化用户导出数据。
+- 数据起始2005年
 
 ```python
 # 获取单只股票的日线数据（指定日期范围）
@@ -248,6 +250,53 @@ df = api.daily(trade_date='20260331',offset=0, limit=10)
 > - `turnover_rate`：换手率
 > - `amp_rate`：振幅
 > - `is_paused` / `is_st`：是否停牌 / 是否 ST
+
+### 实时日线（兼容）
+
+- 数据说明：实时获取 A 股快照数据，支持单支、多代码并发以及通配符筛选全市场。为了稳定，接口提供 **20s缓存**。
+- **注意**：本接口需要token才能使用, 限制20次/分钟,token在官网个人资料页面获取(<https://quant.zizizaizai.com/me/profile>)
+
+```python
+# 获取单只股票的实时快照
+df = api.rt_k(ts_code='600000.SH')
+
+# 并发获取多只股票的实时快照（使用逗号分隔）
+df = api.rt_k(ts_code='600000.SH,000001.SZ')
+
+# 支持通配符：一次性过滤获取所有创业板状态
+df = api.rt_k(ts_code='3*.SZ')
+
+# 获取底层全量字段视图（如换手率、涨跌幅、总市值等高级指标）
+df = api.rt_k(ts_code='000001.SZ', fields='all')
+```
+
+`rt_k` 接口默认返回的底层兼容 14 字段说明：
+
+| 字段名 | 说明 |
+| :--- | :--- |
+| `ts_code` | 股票代码 |
+| `name` | 股票名称 |
+| `pre_close` | 昨收价 |
+| `high` | 最高价 |
+| `open` | 开盘价 |
+| `low` | 最低价 |
+| `close` | 现价/实时收盘价 |
+| `vol` | 成交量 |
+| `amount` | 成交金额 |
+| `num` | 成交笔数（若源不支持则返回 0） |
+| `ask_price1` | 卖一价 |
+| `ask_volume1` | 卖一量 |
+| `bid_price1` | 买一价 |
+| `bid_volume1` | 买一量 |
+
+> 🚀 **增强模式说明**：
+> 当指定了 `fields='all'`，接口将会在此基础上补充透传以下高级量化数据（收到数据后，内置会自动将其转为 `float/int` 类型）：
+>
+> - **行情涨势**：`quote_rate`（涨跌幅）、`turnover_rate`（换手率）、`min5_chgpct`（5分钟涨跌幅）
+> - **市值与限额**：`high_limit` / `low_limit`（涨跌停价）、`market_value` / `circulation_value`（总市值 / 流通市值）
+> - **集合竞价**：`auction_px`（竞价成交价）、`auction_vol`（竞价成交量）、`auction_val`（竞价成交额）
+> - **切片盘口**：`bid_grp`（多档买盘数据）、`offer_grp`（多档卖盘数据）
+> - **财务估值**：`ttm_pe_rate`（滚动市盈率）、`eps_ttm`（滚动每股收益）
 
 ### 分钟K线（兼容）
 
@@ -495,8 +544,8 @@ result = api.query('your/custom/path', params={'key': 'value'})
 
 <details>
 <summary><b>Q: 需要申请 Token 吗？</b></summary>
-
-不需要！zzshare 开箱即用，无需申请任何 Token。
+大部分不需要，但是为了保障接口稳定性，zzshare 部分接口需要 API Token。
+您可以在 [个人中心](https://api.zizizaizai.com/user/profile) 免费获取初始 Token。
 
 </details>
 
