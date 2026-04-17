@@ -1,0 +1,9 @@
+[distutils]
+index-servers =
+    pypi
+
+[pypi]
+# 建议在 PyPI 设置中生成 API Token。
+# 生成后将 token (以 pypi- 开头) 填入下方，并将此文件重命名为 ~/.pypirc (Linux/macOS) 或 $HOME/.pypirc (Windows)
+username = __token__
+password = pypi-YOUR_TOKEN_HERE

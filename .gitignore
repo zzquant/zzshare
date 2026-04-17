@@ -28,3 +28,4 @@ env/
 .DS_Store
 test*.py
 plan_skill.md
+.pypirc
