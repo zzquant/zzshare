@@ -11,13 +11,13 @@ zzshare.set_level('INFO')
 
 api = DataApi(
     # 获取地址:https://quant.zizizaizai.com/me/profile
-    token=os.getenv("ZZSHARE_TOKEN1", "fake-token-for-test"), # 在环境变量中获取,或者明确写到这里
+    token=os.getenv("ZZSHARE_TOKEN", "fake-token-for-test"), # 在环境变量中获取,或者明确写到这里
 )
 
 # 直接打印出 api 支持的所有接口名字
 # print([method for method in dir(api) if not method.startswith('_')])
-# git tag v0.2.0
-# git push origin v0.2.0
+# git tag v0.2.1
+# git push origin v0.2.1
 
 # 获取日线行情
 # df = api.daily(ts_code='920978.BJ', start_date='20250101', end_date='20250131')

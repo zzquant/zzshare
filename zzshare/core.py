@@ -5,9 +5,17 @@ from typing import Any, Optional, Dict, Callable, List, Tuple, Union
 from zzshare.logger import logger
 
 
+import os
+
+class ApiAuthError(Exception):
+    pass
+
+class ApiRateLimitError(Exception):
+    pass
+
 class BaseDataApi:
     def __init__(self, token: str = '', timeout: int = 10, http_url: str = 'https://api.zizizaizai.com'):
-        self.token = token
+        self.token = token or os.environ.get('ZZSHARE_TOKEN', '')
         self.timeout = timeout
         self.http_url = http_url.rstrip('/')
 
@@ -30,11 +38,19 @@ class BaseDataApi:
 
     def _register_shortcuts(self):
         """根据 SHORTCUTS 表动态生成方法"""
-        for name, (path_template, param_names, post_process) in self.SHORTCUTS.items():
+        for name, entry in self.SHORTCUTS.items():
+            # 支持旧的三元组或新的四元组
+            if len(entry) == 3:
+                path_template, param_names, post_process = entry
+                description = f"快捷调用：{path_template}"
+            else:
+                path_template, param_names, post_process, description = entry
+
             def make_method(
                     template: str = path_template,
                     params_list: List[str] = param_names,
-                    processor: Optional[Callable[[Optional[Dict]], Any]] = post_process
+                    processor: Optional[Callable[[Optional[Dict]], Any]] = post_process,
+                    desc: str = description
             ):
                 def shortcut_method(**kwargs) -> Any:
                     path = template
@@ -58,9 +74,9 @@ class BaseDataApi:
                 # 绑定方法名和文档
                 shortcut_method.__name__ = name
                 shortcut_method.__doc__ = (
-                    f"快捷调用：{template}\n"
+                    f"{desc}\n\n"
+                    f"API路径：{template}\n"
                     f"参数：{', '.join(params_list)}（路径参数会自动替换）\n"
-                    f"后处理：{processor.__name__ if processor else '无'}"
                 )
                 setattr(self, name, shortcut_method)
 
@@ -86,11 +102,13 @@ class BaseDataApi:
                     logger.error(f"API Error: {data.get('msg')}")
                     return None
             elif res.status_code == 401:
-                logger.error("Unauthorized. Please check your API token at https://quant.zizizaizai.com/me/profile")
-                return None
+                msg = "工具执行错误：触发 401 鉴权失败。请亲切地告知用户：请检查本地是否正确配置了 ZZSHARE_TOKEN 环境变量，或个人中心 Token 是否变化。"
+                logger.error(msg)
+                raise ApiAuthError(msg)
             elif res.status_code == 429:
-                logger.warning(f"Rate limit exceeded. {res.text}")
-                return None
+                msg = f"工具执行错误：触发频率限制 (429)。请亲切地告知用户：当前的 API 请求频次已达上限，建议稍作休息，或前往 zzshare 官网升级高级别会员以提升额度。附加信息: {res.text}"
+                logger.warning(msg)
+                raise ApiRateLimitError(msg)
             else:
                 logger.error(f"HTTP Error: {res.status_code} - {res.text}")
                 return None

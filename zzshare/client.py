@@ -16,224 +16,271 @@ class DataApi(BaseDataApi):
         "uplimit_hot": (
             "open/review/uplimit/hot",
             ["date1", "board"],
-            None
+            None,
+            "获取当日涨停热点板块及其连板梯队数据"
         ),
         "uplimit_stocks": (
             "open/review/uplimit/stocks/{date1}",
             ["date1"],
-            None
+            None,
+            "获取指定日期所有涨停股票的列表"
         ),
         # Sentiment Data
         "market_plate_stocks": (
             "market/plates/17/{plate_code}/stocks/rank",
             ["plate_code", "date1", "is_real", "limit"],
-            None
+            None,
+            "获取特定板块内的成分股涨跌幅排名"
         ),
         "market_plate": (
             "market/plates/17/rank",
             ["date1", "limit"],
-            None
+            None,
+            "获取全市场所有板块（行业/概念）的热度排名"
         ),
         "market_sentiment": (
             "v2/api/sentiment/kline/day/0",
             ["date1", "date2"],
-            None
+            None,
+            "综合市场情绪数据量化出来的K线数据"
         ),
         "market_hot_sentiment": (
             "v2/api/sentiment/kline/day/20",
             ["date1", "date2"],
-            None
+            None,
+            "市场热度情绪走势量化出来的K线数据"
         ),
         "market_style": (
             "v2/api/timing/market/style",
             ["date1"],
-            None
+            None,
+            "市场风格评估数据,适合什么风格的市场,量化出来的K线数据"
         ),
         "open_sentiment_data": (
             "open/sentiment/data",
             ["date1", "date2"],
-            None
+            None,
+            "多维情绪聚合数据接口"
         ),
         # Kline
         "daily": (
             "open/kline/d/{code}",
             ["code", "date1", "date2"],
-            kline_data_to_df
+            kline_data_to_df,
+            "获取日线行情数据"
         ),
         # Base Data
         "trade_days": (
             "market/trade/days",
             ["day_start", "day_end", "days"],
-            None
+            None,
+            "查询 A 股交易日历（识别交易日与假期）"
         ),
         # Third Party
         "ths_hot_top": (
             "open/sentiment/media/ths2/top",
             ["date1", "top_n"],
-            None
+            None,
+            "获取同花顺热搜榜前 N 名龙头的实时排名"
         ),
         "stock_ths_hot": (
             "v2/api/sentiment/media/ths/symbol/{code}",
             ["code", "date1"],
-            None
+            None,
+            "查询特定股票在同花顺平台的热度趋势"
         ),
         "sentiment_market_hot_day": (
             "v3/api/sentiment/market/hot/day",
             ["date"],
-            None
+            None,
+            "每日市场核心热点数据统计"
         ),
         "sentiment_trend": (
             "v3/api/sentiment/trend/{model}",
             ["model", "date1"],
-            None
+            None,
+            "基于特定模型计算的市场情绪分时数据"
         ),
         "sentiment_trend_range": (
             "v3/api/sentiment/trend/{model}/range",
             ["model", "date1", "date2"],
-            None
+            None,
+            "区间市场情绪分时数据"
         ),
         "review_uplimit_reason": (
             "v3/api/review/uplimit/reason",
             ["date1", "group", "page", "page_size"],
-            None
+            None,
+            "全市场涨停复盘：包含个股具体的涨停原因与逻辑分析"
         ),
         "review_uplimit_hot_open": (
             "v3/open/review/uplimit/hot",
             ["date1", "date2", "board", "limit"],
-            None
+            None,
+            "开放版热点涨停分析" # ?
         ),
         "stock_uplimit_reason": (
             "v3/open/stock/uplimit/reason/{stock_code}",
             ["stock_code", "date"],
-            None
+            None,
+            "查询单只股票指定日期的涨停原因"
         ),
         "stock_uplimit_reason_history": (
-            "v3/open/stock/uplimit/reason/history/{stock_code}", ["stock_code", "page", "pageSize"], None),
+            "v3/open/stock/uplimit/reason/history/{stock_code}", ["stock_code", "page", "pageSize"], None, "查询个股历史所有涨停记录及原因"),
         "review_uplimit_reason_open": (
             "v3/open/review/uplimit/reason",
             ["date1"],
-            None
+            None,
+            "指定日期全部涨停个股的涨停数据和原因汇总"
         ),
         "stock_info": (
             "v3/open/stock/info",
             ["stock_id", "info_type"],
-            None
+            None,
+            "获取股票的基础信息扩展字段"
         ),
-        # ================== 新增接口 ==================
         # 龙虎榜数据
         "lhb_list": (
             "market/lhb/list",
             ["date1"],
-            None
+            None,
+            "龙虎榜每日上榜股票概览列表"
         ),
         "lhb_detail": (
             "market/lhb/detail",
             ["date1", "stock_code"],
-            None
+            None,
+            "查询特定股票的龙虎榜席位买卖详情"
         ),
         "lhb_stock_history": (
             "market/lhb/stock/history",
             ["stock_code", "trader_name"],
-            None
+            None,
+            "查询个股或特定营业部的历史龙虎榜表现"
         ),
         "lhb_trader_history": (
             "market/lhb/trader/history",
             ["trader_name", "trader_id", "stock_code", "page", "per_page"],
-            None
+            None,
+            "龙虎榜知名游资/席位的历史交易轨迹"
         ),
         # 板块数据
         "plates_list": (
             "market/plates/{plate_type}",
             ["plate_type"],
-            None
+            None,
+            "获取指定类型（行业/概念/风格）的所有板块列表"
         ),
         "plates_rank": (
             "market/plates/{plate_type}/rank",
             ["plate_type", "date1", "limit"],
-            None
+            None,
+            "板块涨跌幅/综合热度实时排名"
         ),
         "plates_trend": (
             "market/plates/{plate_type}/trend",
             ["plate_type", "plate_code", "day_start", "day_end"],
-            None
+            None,
+            "指定板块的分时数据"
         ),
         "plates_stocks": (
             "market/plates/{plate_type}/{plate_code}/stocks",
             ["plate_type", "plate_code", "date"],
-            None
+            None,
+            "查询特定板块包含的所有个股详情"
         ),
         # 涨跌分布与情绪
         "updown_distribution": (
             "open/sentiment/updown/disctribution",
             ["date1"],
-            None
+            None,
+            "全市场每日上涨、下跌家数分布及涨停/跌停总数统计"
         ),
         "uplimit_trend": (
             "open/sentiment/uplimit/trend",
             ["date1"],
-            None
+            None,
+            "全市场涨停家数趋势及赚钱效应分析"
         ),
         "sentiment_hot_day": (
             "open/sentiment/hot/day",
             ["index", "st"],
-            None
+            None,
+            "市场每日核心人气热点排名"
         ),
         "sentiment_level": (
             "open/sentiment/level",
             ["date"],
-            None
+            None,
+            "整点市场情绪等级评估"
         ),
         "sentiment_bull_data": (
             "open/sentiment/bull/data",
             ["date1", "date2"],
-            None
+            None,
+            "多空情绪对比及牛市指标参考"
         ),
         # 行情实时数据
-        "stock_moneyflow": (
-            "open/stock/{stock_id}/moneyflow",
-            ["stock_id", "m_type"],
-            None
-        ),
-        "market_mf": (
-            "open/market/mf",
-            ["stock", "date", "wm", "default_v"],
-            None
-        ),
+        # "stock_moneyflow": (
+        #     "open/stock/{stock_id}/moneyflow",
+        #     ["stock_id", "m_type"],
+        #     None,
+        #     "个股实时主力主力资金流向（超大单/大单等）"
+        # ),
+        # "market_mf": (
+        #     "open/market/mf",
+        #     ["stock", "date", "wm", "default_v"],
+        #     None,
+        #     "全量市场资金流分布概览"
+        # ),
         # 涨停市值统计
         "uplimit_market_value": (
             "v2/api/uplimit/market/value",
             ["date1", "date2"],
-            None
+            None,
+            "基于市值的涨停板个股分布统计"
         ),
         # 市场TopN情绪
-        "sentiment_market_top_n": (
-            "v2/api/sentiment/market/top/n",
-            ["modal_id", "date1", "date2"],
-            None
-        ),
+        # "sentiment_market_top_n": (
+        #     "v2/api/sentiment/market/top/n",
+        #     ["modal_id", "date1", "date2"],
+        #     None,
+        #     "市场最热的前 N 名热点概念动态跟踪"
+        # ),
         # 异动数据
         "movement_alerts": (
             "market/movement/alerts",
             ["date1", "type", "limit", "is_real"],
-            None
+            None,
+            "沪深涨幅触发监管以及距离触发的空间"
         ),
         # 监控数据
         "zdjk_get": (
             "open/zdjk/get",
             ["date1", "date2"],
-            None
+            None,
+            "已经触发监管的股票列表"
         ),
     }
 
     def _register_shortcuts(self):
         """根据 SHORTCUTS 表动态生成方法"""
-        for name, (path_template, param_names, post_process) in self.SHORTCUTS.items():
+        for name, entry in self.SHORTCUTS.items():
             if name == "daily":
                 continue
+            
+            # 支持旧的三元组或新的四元组
+            if len(entry) == 3:
+                path_template, param_names, post_process = entry
+                description = f"快捷调用：{path_template}"
+            else:
+                path_template, param_names, post_process, description = entry
+
             def make_method(
                     template: str = path_template,
                     params_list: List[str] = param_names,
-                    processor: Optional[Callable[[Optional[Dict]], Any]] = post_process
+                    processor: Optional[Callable[[Optional[Dict]], Any]] = post_process,
+                    desc: str = description
             ):
                 def shortcut_method(**kwargs) -> Any:
                     path = template
@@ -257,9 +304,9 @@ class DataApi(BaseDataApi):
                 # 绑定方法名和文档
                 shortcut_method.__name__ = name
                 shortcut_method.__doc__ = (
-                    f"快捷调用：{template}\n"
+                    f"{desc}\n\n"
+                    f"API路径：{template}\n"
                     f"参数：{', '.join(params_list)}（路径参数会自动替换）\n"
-                    f"后处理：{processor.__name__ if processor else '无'}"
                 )
                 setattr(self, name, shortcut_method)
 

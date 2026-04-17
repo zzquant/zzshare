@@ -29,8 +29,57 @@
 **推荐安装方式（通过 PyPI）**：
 
 ```bash
+# 基础安装
 pip install zzshare
+
+# ✅ 安装 AI Agent (MCP) 扩展支持
+pip install "zzshare[mcp]"
 ```
+
+***
+
+## 🤖 For AI Agents & LLMs (MCP 全球服务)
+
+`zzshare` 原生支持 **Model Context Protocol (MCP)**。我们精心调优了其在 LLM 上下文环境中的表现，通过 Token 防御与动态 Schema 给大模型带来最佳的零代码获取量化数据体验。
+
+如果你是一名在 **Claude Desktop, Cursor, Zed** 等支持 MCP 协议的软件中的开发者，只需在相关配置中添加如下配置，即可解锁数十个股市查询能力（向 AI 提问如：“今日涨停榜分析” 或 “打印 600519 最近一周走势”）：
+
+**适用于 Claude Desktop 的配置 (`claude_desktop_config.json`)**:
+```json
+{
+  "mcpServers": {
+    "zzshare-quant": {
+      "command": "zzshare-mcp",
+      "args": [],
+      "env": {
+        "ZZSHARE_TOKEN": "YOUR_API_TOKEN_HERE" // 您可以在 https://quant.zizizaizai.com 获取
+      }
+    }
+  }
+}
+```
+
+如果你是在终端构建 AI 智能体（如 GStack Agent / OpenCode），可直接使用我们提供的 `zzshare-cli` 控制台工具进行快速提数。
+
+***
+
+## 💡 AI Agent 使用秘籍 (Pro Tips)
+
+为了让大模型更好地为您提供量化分析建议，我们建议在提示词中加入以下技巧：
+
+### 1. 自动处理非交易日 (Self-Correction)
+`zzshare` 内置了**大模型私语 (Secret Prompting)**。当模型查询的数据返回为空时（通常因为当天是周六日或节假日），系统会自动提示模型：“*数据为空，请核实是否为交易日*”。
+> **推荐 Prompt**: "如果数据返回为空，请先调用 `trade_days` 检查最近的开盘日期，并以此自动调整查询范围。"
+
+### 2. 语义化工具发现
+所有的接口都已配备了**语义化描述**。模型可以清晰地分辨什么是“龙虎榜席位分析”，什么是“市场情绪分布”。
+> **示例指令**: "分析一下今天全市场的涨跌停分布，并列出排名前三的热点板块及其领涨股。"
+
+### 3. Token 防御机制
+无需担心金融大表刷屏导致上下文崩溃。`zzshare` 会自动对长表格进行双端截断并转换为 Markdown，确保大模型始终能看到最新的走势和表头信息。
+
+***
+
 
 <details>
 <summary><b>高级安装选项</b></summary>

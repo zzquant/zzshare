@@ -1,0 +1,10 @@
+# smithery.yaml
+# MCP Server Configuration for Claude Desktop / Cursor
+version: "1.0.0"
+servers:
+  - name: "zzshare-quant"
+    description: "A股量化数据引擎，提供最新的日线、连板数据、情绪等多维度接口"
+    command: "zzshare-mcp"
+    args: []
+    env:
+      ZZSHARE_TOKEN: "YOUR_API_TOKEN_HERE"
