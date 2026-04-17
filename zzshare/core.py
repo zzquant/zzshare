@@ -2,6 +2,8 @@
 import requests
 from typing import Any, Optional, Dict, Callable, List, Tuple, Union
 
+from zzshare.logger import logger
+
 
 class BaseDataApi:
     def __init__(self, token: str = '', timeout: int = 10, http_url: str = 'https://api.zizizaizai.com'):
@@ -81,13 +83,19 @@ class BaseDataApi:
                 if data.get('code') == 20000:
                     return data.get('data')
                 else:
-                    print(f"API Error: {data.get('msg')}")
+                    logger.error(f"API Error: {data.get('msg')}")
                     return None
+            elif res.status_code == 401:
+                logger.error("Unauthorized. Please check your API token at https://quant.zizizaizai.com/me/profile")
+                return None
+            elif res.status_code == 429:
+                logger.warning(f"Rate limit exceeded. {res.text}")
+                return None
             else:
-                print(f"HTTP Error: {res.status_code} - {res.text}")
+                logger.error(f"HTTP Error: {res.status_code} - {res.text}")
                 return None
         except Exception as e:
-            print(f"Request Error: {e}")
+            logger.exception(f"Request Error: {e}")
             return None
 
     def query(self, api_name: str, params: Optional[Dict] = None) -> Optional[Dict]:

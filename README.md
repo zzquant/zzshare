@@ -17,10 +17,10 @@
 
 - 🚀 **开箱即用** - 无需申请，安装即可使用
 - 📅 **数据范围** - 行情数据2005年至今(20年+)，其他数据根据接口提供方数据为准。
-- 📊 **丰富数据** - 行情数据、涨停复盘、龙虎榜、情绪指标、板块热度等 40+ 接口
-- 🔄 **兼容 某些接口** - 接口规范兼容某些接口,比如tushare等，迁移成本低
-- ⚡ **实时数据** - 支持日线、分钟线、资金流向等盘中实时数据
-- 🐍 **类型提示** - 完整的 `.pyi` 类型文件，IDE 自动补全
+- 📊 **丰富数据** - 行情数据、涨停复盘、龙虎榜、情绪指标、板块热度等 40+ 接口。
+- 🔄 **兼容 某些接口** - 接口规范兼容某些接口,比如tushare等。
+- ⚡ **实时数据** - 支持日线、分钟线、资金流向等盘中实时数据。
+- 🐍 **类型提示** - 完整的 `.pyi` 类型文件，IDE 自动补全。
 
 ***
 
@@ -66,7 +66,7 @@ pip install zzshare --upgrade
 ```python
 from zzshare.client import DataApi
 
-# [可选,部分接口需要]Token 可在官网个人资料页面获取(https://quant.zizizaizai.com/me/profile)
+# [可选,提高访问频率使用]Token 可在官网个人资料页面获取(https://quant.zizizaizai.com/me/profile)
 api = DataApi(token='your_api_token_here')
 
 # 获取日线行情
@@ -77,6 +77,11 @@ print(df)
 **更多示例：**
 
 ```python
+# 查询全市场股票列表（SS/KSH/SZ/GEM/BJ）
+stock_list = api.stock_basic(exchange='',fields='ts_code,name,exchang')
+
+
+
 # 获取今日涨停热门板块
 hot = api.uplimit_hot(date1='20250205')
 
@@ -89,7 +94,7 @@ ths_top = api.ths_hot_top(date1='20250205', top_n=100)
 # 获取交易日历
 days = api.trade_days(days=30)
 
-# tushare 兼容：获取股票基础信息
+# tushare 兼容：获取股票列表
 basic = api.stock_basic(exchange='SSE', list_status='L', fields='ts_code,symbol,name,exchange,list_status')
 ```
 
@@ -99,18 +104,15 @@ basic = api.stock_basic(exchange='SSE', list_status='L', fields='ts_code,symbol,
 
 ### 核心接口 (已实现)
 
-| 分类       | 接口                                                     | 描述                           |
-| :------- | :----------------------------------------------------- | :--------------------------- |
-| **日线数据** | `daily`                                                | 个股日K线，返回 DataFrame |
-| **分时数据** | `stk_mins`                                             | 个股分钟K线，返回 DataFrame |
-| **涨停复盘** | `uplimit_hot` `uplimit_stocks`                         | 涨停热门板块、涨停股票                  |
-| **涨停原因** | `stock_uplimit_reason` `review_uplimit_reason`         | 个股/全市场涨停原因                   |
-| **龙虎榜**  | `lhb_list` `lhb_detail` `lhb_stock_history`            | 龙虎榜列表、详情、历史                  |
-| **板块数据** | `plates_list` `plates_rank` `market_plate`             | 板块列表、排名、热门                   |
-| **情绪指标** | `market_sentiment` `sentiment_trend` `sentiment_level` | 市场情绪K线、趋势、级别                 |
-| **热度数据** | `ths_hot_top` `stock_ths_hot`                          | 同花顺热度排行、个股热度                 |
-| **实时行情** | `stock_moneyflow`                                      | 资金流向                    |
-| **基础数据** | `trade_days` `stock_info` `stock_basic`                | 交易日历、个股信息、股票基础信息（tushare 兼容） |
+| 分类 | 核心接口 | 功能描述 |
+| :--- | :--- | :--- |
+| **基础行情** | `daily`, `stk_mins`, `rt_k` | 历史日K、分钟K、实时快照（支持复权） |
+| **基础数据** | `stock_basic`, `trade_days`, `stock_info` | 股票列表、交易日历、个股基础资料 |
+| **涨停复盘** | `uplimit_hot`, `uplimit_stocks`, `stock_uplimit_reason` | 涨停梯队、热门板块、个股涨停原因 |
+| **龙虎榜单** | `lhb_list`, `lhb_detail`, `lhb_stock_history` | 龙虎榜列表、个股详情、席位交易历史 |
+| **情绪热度** | `market_sentiment`, `sentiment_trend`, `ths_hot_top` | 市场情绪指标、情绪趋势、同花顺热度 |
+| **板块分析** | `plates_list`, `plates_rank`, `market_plate` | 行业/概念板块列表、排名、热门成分股 |
+| **资金流向** | `stock_moneyflow`, `market_mf` | 个股实时资金流向、市场分钟级资金监控 |
 
 > 💡 共计 **40+** 个已实现接口，完整列表见下方。
 
@@ -362,6 +364,8 @@ df = api.stk_mins(
 | `close` | 收盘价 |
 | `vol` | 成交量（股） |
 | `amount` | 成交额（元） |
+
+- **注意**：本接口在未配置 Token 的情况下，访问频率（30次/分钟）。如需更高频次调用，请配置您的 SDK Token。
 
 `stk_mins` 接口参数说明：
 

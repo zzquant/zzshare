@@ -27,3 +27,4 @@ env/
 .Python
 .DS_Store
 test*.py
+plan_skill.md

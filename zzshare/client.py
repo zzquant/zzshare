@@ -4,6 +4,7 @@ import pandas as pd
 
 from zzshare.core import BaseDataApi
 from zzshare.utils import kline_data_to_df
+from zzshare.logger import logger
 
 
 class DataApi(BaseDataApi):
@@ -337,7 +338,7 @@ class DataApi(BaseDataApi):
             response.raise_for_status()
             data = response.json().get("data", {}).get("list", [])
         except Exception as e:
-            print(f"Request Error: {e}")
+            logger.exception(f"Request Error: {e}")
             data = []
         df = pd.DataFrame(data)
 
@@ -426,7 +427,14 @@ class DataApi(BaseDataApi):
                         data = body.get("data")
                     else:
                         data = body
-        except Exception:
+            elif res.status_code == 401:
+                logger.error("Unauthorized. Please check your API token at https://quant.zizizaizai.com/me/profile")
+            elif res.status_code == 429:
+                logger.warning(f"Rate limit exceeded. {res.text}")
+            else:
+                logger.error(f"HTTP Error: {res.status_code} - {res.text}")
+        except Exception as e:
+            logger.exception(f"Request Error: {e}")
             data = None
         records: List[Dict[str, Any]] = []
         data_ts_code: Optional[str] = None
@@ -580,7 +588,14 @@ class DataApi(BaseDataApi):
                         data = body.get("data")
                     else:
                         data = body
-        except Exception:
+            elif res.status_code == 401:
+                logger.error("Unauthorized. Please check your API token at https://quant.zizizaizai.com/me/profile")
+            elif res.status_code == 429:
+                logger.warning(f"Rate limit exceeded. {res.text}")
+            else:
+                logger.error(f"HTTP Error: {res.status_code} - {res.text}")
+        except Exception as e:
+            logger.exception(f"Request Error: {e}")
             data = None
 
         records: List[Dict[str, Any]] = []

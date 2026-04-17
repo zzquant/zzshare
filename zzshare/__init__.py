@@ -2,6 +2,7 @@
 from typing import Any, Callable, Optional
 
 from zzshare.client import DataApi
+from zzshare.logger import set_level
 
 
 _default_api: Optional[DataApi] = None
@@ -78,4 +79,4 @@ for _shortcut_name in DataApi.SHORTCUTS:
     globals()[_shortcut_name] = _create_shortcut_proxy(_shortcut_name)
 
 
-__all__ = ["DataApi", "pro_api", "daily", "stock_basic", "query", *[name for name in DataApi.SHORTCUTS if name != "daily"]]
+__all__ = ["DataApi", "pro_api", "daily", "stock_basic", "query", "set_level", *[name for name in DataApi.SHORTCUTS if name != "daily"]]
