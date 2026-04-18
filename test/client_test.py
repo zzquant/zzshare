@@ -61,11 +61,11 @@ class DataApiTest(unittest.TestCase):
     def test_market_plate_stocks_real_mode(self):
         self._call_api_method("market_plate_stocks", plate_code="801070", date1="2026-02-03", is_real=1)
 
-    def test_market_plate_default(self):
-        self._call_api_method("market_plate", date1="2026-02-03")
+    def test_plates_rank_default(self):
+        self._call_api_method("plates_rank", plate_type=17, date1="2026-02-03")
 
-    def test_market_plate_with_limit(self):
-        self._call_api_method("market_plate", date1="2026-02-03", limit=5)
+    def test_plates_rank_with_limit(self):
+        self._call_api_method("plates_rank", plate_type=17, date1="2026-02-03", limit=5)
 
     def test_market_sentiment_single_day(self):
         self._call_api_method("market_sentiment", date1="2026-02-03")

@@ -32,12 +32,6 @@ class DataApi:
         limit: int = 50
     ) -> Any: ...
 
-    def market_plate(
-        self,
-        date1: str,
-        limit: int = 3
-    ) -> Any: ...
-
     def market_sentiment(
         self,
         date1: str,

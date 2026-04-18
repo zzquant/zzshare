@@ -96,7 +96,7 @@ class BaseDataApi:
             )
             if res.status_code == 200:
                 data = res.json()
-                if data.get('code') == 20000:
+                if data.get('code') == 20000 or data.get('code') == 200:
                     return data.get('data')
                 else:
                     logger.error(f"API Error: {data.get('msg')}")

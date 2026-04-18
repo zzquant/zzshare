@@ -27,16 +27,10 @@ class DataApi(BaseDataApi):
         ),
         # Sentiment Data
         "market_plate_stocks": (
-            "market/plates/17/{plate_code}/stocks/rank",
-            ["plate_code", "date1", "is_real", "limit"],
+            "v3/market/plates/{plate_type}/{plate_code}/stocks/rank",
+            ["plate_type", "plate_code", "date1", "is_real", "limit"],
             None,
-            "获取特定板块内的成分股涨跌幅排名"
-        ),
-        "market_plate": (
-            "market/plates/17/rank",
-            ["date1", "limit"],
-            None,
-            "获取全市场所有板块（行业/概念）的热度排名"
+            "获取特定板块内的成分股,按照人气排名"
         ),
         "market_sentiment": (
             "v2/api/sentiment/kline/day/0",
@@ -169,19 +163,25 @@ class DataApi(BaseDataApi):
             "market/plates/{plate_type}",
             ["plate_type"],
             None,
-            "获取指定类型（行业/概念/风格）的所有板块列表"
+            "获取指定类型（（17(题材)/15(概念)/14(行业)）的所有板块列表"
         ),
         "plates_rank": (
-            "market/plates/{plate_type}/rank",
+            "v3/market/plates/{plate_type}/rank",
             ["plate_type", "date1", "limit"],
             None,
-            "板块涨跌幅/综合热度实时排名"
+            "获取全市场所有板块（17(题材)/15(概念)/14(行业)）的热度排名"
         ),
         "plates_trend": (
             "market/plates/{plate_type}/trend",
             ["plate_type", "plate_code", "day_start", "day_end"],
             None,
             "指定板块的分时数据"
+        ),
+        "plates_rank_days": (
+            "v3/market/plates/{plate_type}/rank/days",
+            ["plate_type", "date2", "n_days", "n_type", "limit"],
+            None,
+            "查询板块类型在过去 N 天内的区间涨跌幅排名（如近5日、10日价格/热度区间排名）"
         ),
         "plates_stocks": (
             "market/plates/{plate_type}/{plate_code}/stocks",

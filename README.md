@@ -112,7 +112,7 @@ basic = api.stock_basic(exchange='SSE', list_status='L', fields='ts_code,symbol,
 | **涨停复盘** | `uplimit_hot`, `uplimit_stocks`, `stock_uplimit_reason` | 涨停梯队、热门板块、个股涨停原因 |
 | **龙虎榜单** | `lhb_list`, `lhb_detail`, `lhb_stock_history` | 龙虎榜列表、个股详情、席位交易历史 |
 | **情绪热度** | `market_sentiment`, `sentiment_trend`, `ths_hot_top` | 市场情绪指标、情绪趋势、同花顺热度 |
-| **板块分析** | `plates_list`, `plates_rank`, `market_plate` | 行业/概念板块列表、排名、热门成分股 |
+| **板块分析** | `plates_list`, `plates_rank` | 行业/概念板块列表、排名、热门成分股 |
 | **资金流向** | `stock_moneyflow`, `market_mf` | 个股实时资金流向、市场分钟级资金监控 |
 
 > 💡 共计 **40+** 个已实现接口，完整列表见下方。
@@ -411,14 +411,14 @@ history = api.lhb_stock_history(stock_code='000001')
 ### 板块数据
 
 ```python
-# 获取板块列表 (7=精选, 5=概念, 4=行业)
-plates = api.plates_list(plate_type=7)
+# 获取板块列表 (17=题材, 15=概念, 14=行业)[建议使用某一天的板块排名(plates_rank)来获取板块列表]
+plates = api.plates_list(plate_type=17)
 
-# 获取板块排名
-rank = api.plates_rank(plate_type=7, date1='20250205', limit=20)
+# 获取板块排名 (plate_type: 17=题材, 15=概念, 14=行业)
+rank = api.plates_rank(plate_type=17, date1='20250205', limit=20)
 
-# 获取板块成分股
-stocks = api.market_plate_stocks(plate_code='123456', date1='20250205')
+# 获取板块成分股(按照板块个股人气排名)
+stocks = api.market_plate_stocks(plate_type=17, plate_code='801660', date1='20260416', limit=5)
 ```
 
 ### 情绪指标
@@ -488,10 +488,9 @@ level = api.sentiment_level(date='20250205')
 
 | 方法名                   | 描述      | 参数                                                 |
 | :-------------------- | :------ | :------------------------------------------------- |
-| `market_plate`        | 板块排行    | `date1`, `limit`                                   |
+| `plates_rank`         | 板块排名    | `plate_type`, `date1`, `limit`                     |
 | `market_plate_stocks` | 板块成分股排行 | `plate_code`, `date1`, `is_real`, `limit`          |
 | `plates_list`         | 板块列表    | `plate_type`                                       |
-| `plates_rank`         | 板块排名    | `plate_type`, `date1`, `limit`                     |
 | `plates_trend`        | 板块趋势    | `plate_type`, `plate_code`, `day_start`, `day_end` |
 | `plates_stocks`       | 板块成分股   | `plate_type`, `plate_code`, `date`                 |
 

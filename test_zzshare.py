@@ -16,8 +16,8 @@ api = DataApi(
 
 # 直接打印出 api 支持的所有接口名字
 # print([method for method in dir(api) if not method.startswith('_')])
-# git tag v0.3.0
-# git push origin v0.3.0
+# git tag v0.3.2
+# git push origin v0.3.2
 
 # 获取日线行情
 # df = api.daily(ts_code='920978.BJ', start_date='20250101', end_date='20250131')
@@ -68,3 +68,15 @@ print(df)
 # # 获取某日1分钟K线
 # df = api.stk_mins(ts_code='600000.SH',  trade_time='20260413', freq='1min')
 # print(df)
+
+
+# 板块列表
+# plates = api.plates_list(plate_type=17)
+# print(plates)
+# 板块排名
+# plates = api.plates_rank(plate_type=17, date1='20260417', limit=20)
+# print(plates)
+#板块下个股列表,按照人气排名
+# stocks = api.market_plate_stocks(plate_type=17, plate_code='801660',date1='20260416', limit=3)
+# print(stocks)
+
