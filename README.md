@@ -430,8 +430,6 @@ sentiment = api.market_sentiment(date1='20250101', date2='20250205')
 # 获取情绪趋势
 trend = api.sentiment_trend(model=1, date1='20250205')
 
-# 获取情绪级别
-level = api.sentiment_level(date='20250205')
 ```
 
 ***
@@ -481,7 +479,6 @@ level = api.sentiment_level(date='20250205')
 | `updown_distribution`      | 涨跌分布   | `date1`                   |
 | `uplimit_trend`            | 涨停趋势   | `date1`                   |
 | `sentiment_hot_day`        | 日度市场热度 | `index`, `st`             |
-| `sentiment_level`          | 情绪级别   | `date`                    |
 | `sentiment_bull_data`      | 牛熊情绪   | `date1`, `date2`          |
 
 ### 板块数据

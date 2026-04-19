@@ -29,6 +29,29 @@ def main():
     mins_parser.add_argument("--end_time", type=str, help="结束时间 YYYYMMDDHHMM")
     mins_parser.add_argument("--limit", type=int, help="数量限制")
 
+    # Plates Rank
+    pr_parser = subparsers.add_parser("plates_rank", help="获取全市场所有板块的热度排名")
+    pr_parser.add_argument("--plate_type", type=int, required=True, help="板块类型 (17:题材, 15:概念, 14:行业)")
+    pr_parser.add_argument("--date1", type=str, required=True, help="查询日期 (YYYYMMDD)")
+    pr_parser.add_argument("--limit", type=int, default=10, help="返回条数")
+
+    # Plates Rank Days
+    prd_parser = subparsers.add_parser("plates_rank_days", help="查询板天内块排名数据(区间排名)")
+    prd_parser.add_argument("--plate_type", type=int, required=True, help="板块类型 (17:题材, 15:概念, 14:行业)")
+    prd_parser.add_argument("--date2", type=str, required=True, help="截止日期 (YYYYMMDD)")
+    prd_parser.add_argument("--n_days", type=int, default=5, help="累计天数")
+    prd_parser.add_argument("--n_type", type=int, default=3, help="排序类型 (1:涨幅, 3:净额, 9:强度)")
+    prd_parser.add_argument("--limit", type=int, default=10, help="返回条数")
+
+    # Plates Rank Days New
+    prdn_parser = subparsers.add_parser("plates_rank_days_new", help="获取指定板块Top N，并标记是否是前几天新进的")
+    prdn_parser.add_argument("--plate_type", type=int, required=True, help="板块类型 (17:题材, 15:概念, 14:行业)")
+    prdn_parser.add_argument("--date2", type=str, required=True, help="截止日期 (YYYYMMDD)")
+    prdn_parser.add_argument("--n_days", type=int, default=5, help="累计天数")
+    prdn_parser.add_argument("--n_type", type=int, default=3, help="排序类型 (1:涨幅, 3:净额, 9:强度)")
+    prdn_parser.add_argument("--limit", type=int, default=20, help="返回条数")
+    prdn_parser.add_argument("--prev_days", type=int, default=3, help="对比前几日天数")
+
     # Stock Basic
     basic_parser = subparsers.add_parser("stock_basic", help="获取股票基础信息")
     basic_parser.add_argument("--ts_code", type=str, help="股票代码")
@@ -36,7 +59,7 @@ def main():
     
     # 动态把 SHORTCUTS 塞进 CLI
     for name, entry in DataApi.SHORTCUTS.items():
-        if name in ["daily", "stock_basic", "stk_mins"]: 
+        if name in ["daily", "stock_basic", "stk_mins", "plates_rank", "plates_rank_days", "plates_rank_days_new"]: 
             continue
             
         if len(entry) == 4:

@@ -219,7 +219,6 @@ class DataApi:
         st: int = 100
     ) -> Any: ...
     
-    def sentiment_level(self, date: str) -> Any: ...
     
     def sentiment_bull_data(
         self,

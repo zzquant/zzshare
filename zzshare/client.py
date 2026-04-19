@@ -33,16 +33,16 @@ class DataApi(BaseDataApi):
             "获取特定板块内的成分股,按照人气排名"
         ),
         "market_sentiment": (
-            "v2/api/sentiment/kline/day/0",
+            "v3/market/sentiment/0/kline",
             ["date1", "date2"],
             None,
-            "综合市场情绪数据量化出来的K线数据"
+            "综合 market_sentiment 数据量化出来的 K 线数据"
         ),
         "market_hot_sentiment": (
-            "v2/api/sentiment/kline/day/20",
+            "v3/market/sentiment/20/kline",
             ["date1", "date2"],
             None,
-            "市场热度情绪走势量化出来的K线数据"
+            "市场热度 market_hot_sentiment 走势量化出来的 K 线数据"
         ),
         "market_style": (
             "v2/api/timing/market/style",
@@ -183,6 +183,12 @@ class DataApi(BaseDataApi):
             None,
             "查询板块类型在过去 N 天内的区间涨跌幅排名（如近5日、10日价格/热度区间排名）"
         ),
+        "plates_rank_days_new": (
+            "v3/market/plates/{plate_type}/rank/days/new",
+            ["plate_type", "date2", "n_days", "n_type", "limit", "prev_days"],
+            None,
+            "获取指定板块Top N，并标记是否是前几天新进的（区间排名+新进标记）"
+        ),
         "plates_stocks": (
             "market/plates/{plate_type}/{plate_code}/stocks",
             ["plate_type", "plate_code", "date"],
@@ -207,12 +213,6 @@ class DataApi(BaseDataApi):
             ["index", "st"],
             None,
             "市场每日核心人气热点排名"
-        ),
-        "sentiment_level": (
-            "open/sentiment/level",
-            ["date"],
-            None,
-            "整点市场情绪等级评估"
         ),
         "sentiment_bull_data": (
             "open/sentiment/bull/data",
@@ -266,7 +266,7 @@ class DataApi(BaseDataApi):
     def _register_shortcuts(self):
         """根据 SHORTCUTS 表动态生成方法"""
         for name, entry in self.SHORTCUTS.items():
-            if name == "daily":
+            if name in ["daily", "plates_rank", "plates_rank_days", "plates_rank_days_new"]:
                 continue
             
             # 支持旧的三元组或新的四元组
@@ -693,8 +693,59 @@ class DataApi(BaseDataApi):
         ]
         df = df.reindex(columns=ordered_columns)
         df = df.sort_values(by="trade_time", ascending=False).reset_index(drop=True)
-
         return df
+
+    def plates_rank(self, plate_type: int, date1: str, limit: int = 10):
+        """
+        获取全市场所有板块的热度排名
+        :param plate_type: 板块类型 (17:题材, 15:概念, 14:行业)
+        :param date1: 查询日期 (YYYY-MM-DD 或 YYYYMMDD)
+        :param limit: 返回条数，默认 10
+        :return: 板块排名数据
+        """
+        params = {
+            "date1": date1,
+            "limit": limit
+        }
+        return self._query(f"v3/market/plates/{plate_type}/rank", params=params)
+
+    def plates_rank_days(self, plate_type: int, date2: str, n_days: int = 5, n_type: int = 3, limit: int = 10):
+        """
+        查询板块累加排名(区间排名)
+        :param plate_type: 板块类型 (17:题材, 15:概念, 14:行业)
+        :param date2: 截止日期 (YYYY-MM-DD 或 YYYYMMDD)
+        :param n_days: 累计天数，默认 5 天
+        :param n_type: 排序类型 (1:涨幅, 3:净额, 9:强度)
+        :param limit: 返回条数，默认 10
+        :return: 板块区间排名数据
+        """
+        params = {
+            "date2": date2,
+            "n_days": n_days,
+            "n_type": n_type,
+            "limit": limit
+        }
+        return self._query(f"v3/market/plates/{plate_type}/rank/days", params=params)
+
+    def plates_rank_days_new(self, plate_type: int, date2: str, n_days: int = 5, n_type: int = 3, limit: int = 20, prev_days: int = 3):
+        """
+        查询板块累加排名(区间排名)，并标记是否是前几天新进的
+        :param plate_type: 板块类型 (17:题材, 15:概念, 14:行业)
+        :param date2: 截止日期 (YYYY-MM-DD 或 YYYYMMDD)
+        :param n_days: 累计天数，默认 5 天
+        :param n_type: 排序类型 (1:涨幅, 3:净额, 9:强度)
+        :param limit: 返回条数，默认 20
+        :param prev_days: 往前追溯的天数，默认 3
+        :return: 带有 is_new 标记的板块排名数据
+        """
+        params = {
+            "date2": date2,
+            "n_days": n_days,
+            "n_type": n_type,
+            "limit": limit,
+            "prev_days": prev_days
+        }
+        return self._query(f"v3/market/plates/{plate_type}/rank/days/new", params=params)
 
     def stock_basic(
         self,
