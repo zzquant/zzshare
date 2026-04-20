@@ -32,6 +32,12 @@ class DataApi(BaseDataApi):
             None,
             "获取特定板块内的成分股,按照人气排名"
         ),
+        "market_plate_popular_reason": (
+            "v3/market/plate/popular/reason",
+            ["plate_code", "date2"],
+            None,
+            "获取板块题材的爆点/原因列表"
+        ),
         "market_sentiment": (
             "v3/market/sentiment/0/kline",
             ["date1", "date2"],

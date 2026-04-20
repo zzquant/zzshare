@@ -32,6 +32,12 @@ class DataApi:
         limit: int = 50
     ) -> Any: ...
 
+    def market_plate_popular_reason(
+        self,
+        plate_code: str,
+        date2: Optional[str] = None
+    ) -> Any: ...
+
     def market_sentiment(
         self,
         date1: str,
