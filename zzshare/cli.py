@@ -52,6 +52,38 @@ def main():
     prdn_parser.add_argument("--limit", type=int, default=20, help="返回条数")
     prdn_parser.add_argument("--prev_days", type=int, default=3, help="对比前几日天数")
 
+    # Sentiment Trend
+    st_parser = subparsers.add_parser("sentiment_trend", help="基于特定模型计算的市场情绪分时数据(单日)")
+    st_parser.add_argument("--model", type=int, required=True, help="情绪模型 ID (0:综合情绪, 20:市场热度, 1:接力情绪)")
+    st_parser.add_argument("--date1", type=str, help="查询日期 (YYYYMMDD)")
+
+    # Sentiment Trend Range
+    str_parser = subparsers.add_parser("sentiment_trend_range", help="基于特定模型计算的市场情绪分时数据(多日区间)")
+    str_parser.add_argument("--model", type=int, required=True, help="情绪模型 ID (0:综合情绪, 20:市场热度, 1:接力情绪)")
+    str_parser.add_argument("--date1", type=str, required=True, help="开始日期 (YYYYMMDD)")
+    str_parser.add_argument("--date2", type=str, required=True, help="结束日期 (YYYYMMDD)")
+
+    # Market Sentiment (K-Line)
+    ms_parser = subparsers.add_parser("market_sentiment", help="综合市场情绪数据量化出来的 K 线数据")
+    ms_parser.add_argument("--date1", type=str, required=True, help="开始日期 (YYYYMMDD)")
+    ms_parser.add_argument("--date2", type=str, help="结束日期 (YYYYMMDD)")
+
+    # Market Hot Sentiment (K-Line)
+    mhs_parser = subparsers.add_parser("market_hot_sentiment", help="市场热度数据量化出来的 K 线数据")
+    mhs_parser.add_argument("--date1", type=str, required=True, help="开始日期 (YYYYMMDD)")
+    mhs_parser.add_argument("--date2", type=str, help="结束日期 (YYYYMMDD)")
+
+    # Market Plate Popular Reason
+    mppr_parser = subparsers.add_parser("market_plate_popular_reason", help="获取板块题材的爆点/原因列表")
+    mppr_parser.add_argument("--plate_code", type=str, required=True, help="板块代码")
+    mppr_parser.add_argument("--date2", type=str, help="截止日期 (YYYYMMDD)")
+
+    # Review Uplimit Hot (Open)
+    ruho_parser = subparsers.add_parser("review_uplimit_hot_step", help="指定板块下的涨停梯队数据")
+    ruho_parser.add_argument("--date1", type=str, help="查询日期 (YYYYMMDD)")
+    ruho_parser.add_argument("--board", type=str, help="板块代码")
+    ruho_parser.add_argument("--limit", type=int, help="数量限制")
+
     # Stock Basic
     basic_parser = subparsers.add_parser("stock_basic", help="获取股票基础信息")
     basic_parser.add_argument("--ts_code", type=str, help="股票代码")
@@ -59,7 +91,11 @@ def main():
     
     # 动态把 SHORTCUTS 塞进 CLI
     for name, entry in DataApi.SHORTCUTS.items():
-        if name in ["daily", "stock_basic", "stk_mins", "plates_rank", "plates_rank_days", "plates_rank_days_new"]: 
+        if name in [
+            "daily", "stock_basic", "stk_mins", "plates_rank", "plates_rank_days", "plates_rank_days_new", 
+            "sentiment_trend", "sentiment_trend_range", "market_sentiment", "market_hot_sentiment", 
+            "market_plate_popular_reason", "review_uplimit_hot_step"
+        ]: 
             continue
             
         if len(entry) == 4:

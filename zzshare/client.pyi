@@ -135,10 +135,9 @@ class DataApi:
         page_size: Optional[int] = None
     ) -> Any: ...
 
-    def review_uplimit_hot_open(
+    def review_uplimit_hot_step(
         self,
         date1: Optional[str] = None,
-        date2: Optional[str] = None,
         board: Optional[str] = None,
         limit: Optional[int] = None
     ) -> Any: ...

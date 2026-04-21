@@ -42,13 +42,13 @@ class DataApi(BaseDataApi):
             "v3/market/sentiment/0/kline",
             ["date1", "date2"],
             None,
-            "综合 market_sentiment 数据量化出来的 K 线数据"
+            "综合市场情绪数据量化出来的 K 线数据"
         ),
         "market_hot_sentiment": (
             "v3/market/sentiment/20/kline",
             ["date1", "date2"],
             None,
-            "市场热度 market_hot_sentiment 走势量化出来的 K 线数据"
+            "市场热度数据量化出来的 K 线数据"
         ),
         "market_style": (
             "v2/api/timing/market/style",
@@ -99,13 +99,13 @@ class DataApi(BaseDataApi):
             "v3/api/sentiment/trend/{model}",
             ["model", "date1"],
             None,
-            "基于特定模型计算的市场情绪分时数据"
+            "基于特定模型计算的市场情绪分时数据(单日)"
         ),
         "sentiment_trend_range": (
             "v3/api/sentiment/trend/{model}/range",
             ["model", "date1", "date2"],
             None,
-            "区间市场情绪分时数据"
+            "基于特定模型计算的市场情绪分时数据(多日区间)"
         ),
         "review_uplimit_reason": (
             "v3/api/review/uplimit/reason",
@@ -113,11 +113,11 @@ class DataApi(BaseDataApi):
             None,
             "全市场涨停复盘：包含个股具体的涨停原因与逻辑分析"
         ),
-        "review_uplimit_hot_open": (
+        "review_uplimit_hot_step": (
             "v3/open/review/uplimit/hot",
-            ["date1", "date2", "board", "limit"],
+            ["date1", "board", "limit"],
             None,
-            "开放版热点涨停分析" # ?
+            "指定板块下的涨停梯队"
         ),
         "stock_uplimit_reason": (
             "v3/open/stock/uplimit/reason/{stock_code}",
