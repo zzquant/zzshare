@@ -267,6 +267,32 @@ class DataApi(BaseDataApi):
             None,
             "已经触发监管的股票列表"
         ),
+        # AI Report
+        "ai_report_list": (
+            "v3/ai-report/list",
+            ["type", "page", "page_size"],
+            None,
+            "获取 AI 每日收盘/盘前报告列表"
+        ),
+        "ai_report_detail": (
+            "v3/ai-report/detail/{post_id}",
+            ["post_id"],
+            None,
+            "获取 AI 报告的具体详情内容"
+        ),
+        # Topic Table
+        "topic_table_list": (
+            "v3/topic/tables",
+            ["page", "limit", "brief"],
+            None,
+            "获取题材库表格列表"
+        ),
+        "topic_table_detail": (
+            "v3/topic/table/{tid}",
+            ["tid"],
+            None,
+            "获取题材库表格的详细行数据内容"
+        ),
     }
 
     def _register_shortcuts(self):

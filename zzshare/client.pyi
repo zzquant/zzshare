@@ -276,3 +276,23 @@ class DataApi:
         date1: str,
         date2: Optional[str] = None
     ) -> Any: ...
+
+    # AI Report
+    def ai_report_list(
+        self,
+        type: Optional[str] = None,
+        page: int = 1,
+        page_size: int = 20
+    ) -> Any: ...
+
+    def ai_report_detail(self, post_id: int) -> Any: ...
+
+    # Topic Table
+    def topic_table_list(
+        self,
+        page: int = 1,
+        limit: int = 20,
+        brief: int = 0
+    ) -> Any: ...
+
+    def topic_table_detail(self, tid: int) -> Any: ...

@@ -89,12 +89,17 @@ def main():
     basic_parser.add_argument("--ts_code", type=str, help="股票代码")
     basic_parser.add_argument("--name", type=str, help="股票名称(支持模糊查询)")
     
+    # THS Hot Top
+    tht_parser = subparsers.add_parser("ths_hot_top", help="获取同花顺热搜榜前 N 名龙头的实时排名")
+    tht_parser.add_argument("--date1", type=str, help="查询日期 (YYYYMMDD)")
+    tht_parser.add_argument("--top_n", type=int, default=10, help="返回前 N 名")
+    
     # 动态把 SHORTCUTS 塞进 CLI
     for name, entry in DataApi.SHORTCUTS.items():
         if name in [
             "daily", "stock_basic", "stk_mins", "plates_rank", "plates_rank_days", "plates_rank_days_new", 
             "sentiment_trend", "sentiment_trend_range", "market_sentiment", "market_hot_sentiment", 
-            "market_plate_popular_reason", "review_uplimit_hot_step"
+            "market_plate_popular_reason", "review_uplimit_hot_step", "ths_hot_top"
         ]: 
             continue
             
