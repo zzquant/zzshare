@@ -492,6 +492,10 @@ class DataApi(BaseDataApi):
                 if normalized_end:
                     params["end_date"] = normalized_end
             url = f"{self.http_url}/v3/market/kline/day/{use_ts_code}"
+            if limit is not None:
+                params["limit"] = limit
+            if offset is not None:
+                params["offset"] = offset
 
         params.update(kwargs)
         data: Optional[Union[Dict[str, Any], List[Any]]] = None
@@ -614,11 +618,7 @@ class DataApi(BaseDataApi):
 
         df = df.reindex(columns=ordered_columns)
         df = df.sort_values(by="trade_date", ascending=False).reset_index(drop=True)
-        if use_ts_code:
-            if offset is not None:
-                df = df.iloc[offset:]
-            if limit is not None:
-                df = df.head(limit)
+        # 已经由后端处理了 offset 和 limit，无需在客户端二次切片
 
         if fields and fields != "all":
             requested_fields = [field.strip() for field in fields.split(",") if field.strip()]

@@ -170,30 +170,26 @@ df_all = api.stock_basic(
 
 ### 历史日线行情（兼容）
 
-- 数据说明：交易日收盘后提供(沪深京)
-- 全量字段中有复权因子,方便量化用户导出数据。
-- 数据起始2005年
+- **数据范围**：支持 A 股历史日线行情（2005年至今）及全市场单日快照。
+- **分页限制**：单只股票单次请求最多返回 **1000 条**；获取更多历史数据需配合 `offset` 参数, 分页获取。全市场数据一次最多 **10000 条**,一般传递6000就可以获取全市场当日数据。
+- **智能截断**：为保护上下文（LLM/终端），返回超过 1000 行数据时会自动进行智能截断。
 
 ```python
-# 获取单只股票的日线数据（指定日期范围）
-df = api.daily(
-    ts_code='600871.SH',
-    start_date='20260201',
-    end_date='20260203'
-)
+# 获取单只股票的日线数据（指定日期范围）,1000条以内,超过使用分页方式.
+df = api.daily( ts_code='600871.SH', start_date='20260201', end_date='20260203')
+# 获取单只股票的日线数据（指定日期范围）,分页获取. 比如: 每次获取100条,获取三页.
+df = api.daily( ts_code='600871.SH', start_date='20250101', end_date='20260423' , offset=0, limit=100)
+df = api.daily( ts_code='600871.SH', start_date='20250101', end_date='20260423' , offset=100, limit=100)
+df = api.daily( ts_code='600871.SH', start_date='20250101', end_date='20260423' , offset=200, limit=100)
+
 
 # 获取单只股票的日线数据（指定单个交易日）
-df = api.daily(
-    ts_code='600871.SH',
-    trade_date='20260203'
-)
+df = api.daily(ts_code='600871.SH', trade_date='20260203')
 
-# 获取全市场某交易日的所有股票数据（分页）
-df = api.daily(
-    trade_date='20260203',
-    offset=0,
-    limit=10
-)
+# 获取全市场某交易日的所有股票数据（分页取10条）
+df = api.daily(trade_date='20260203',offset=0,limit=10)
+# 获取全市场某交易日的所有股票数据（一次获取全部 limit=6000)
+df = api.daily(trade_date='20260203', limit=6000)
 
 # 指定返回字段
 df = api.daily(
@@ -210,8 +206,7 @@ df = api.daily(
     end_date='20260203',
     adj='qfq'
 )
-# 获取全市场某交易日的所有股票数据（分页）
-df = api.daily(trade_date='20260331',offset=0, limit=10)
+
 
 ```
 
@@ -237,11 +232,11 @@ df = api.daily(trade_date='20260331',offset=0, limit=10)
 - `trade_date`：交易日期，格式如 `20260203`。当 `ts_code` 为空时必填
 - `start_date`：起始日期，格式如 `20260201`
 - `end_date`：结束日期，格式如 `20260203`
-- `offset`：偏移量，用于分页
-- `limit`：返回记录数，用于分页
-- `fields`：指定返回字段，如 `ts_code,trade_date,close,pct_chg`。传入 `'all'` 可返回以下所述的原始底层全量字段
-- `adj`：复权类型，`qfq` 前复权，`hfq` 后复权，默认不复权
-- `export_all`：设为 `True` 时直接返回更多的 18 个全量字段模式
+- `limit`：返回记录数。单股查询上限 1000（默认 1000），全市场查询建议 1-6000
+- `offset`：偏移量，配合 `limit` 实现分页。例如：每页100条，则第二页可设置 `offset=100, limit=100`, 第三页可设置 `offset=200, limit=100`
+- `fields`：指定返回字段，如 `ts_code,trade_date,close,pct_chg`。传入 `'all'` 可返回全量 18 个字段
+- `adj`：复权类型：`qfq` 前复权，`hfq` 后复权，默认不复权
+- `export_all`：设为 `True` 时直接开启全量字段模式
 
 > ✨ **全量字段模式说明**：
 >

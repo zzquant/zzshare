@@ -2,7 +2,7 @@
 import pandas as pd
 from typing import Dict, Any, Type, Optional, List
 
-def format_to_llm(data: Any, max_rows: int = 50) -> str:
+def format_to_llm(data: Any, max_rows: int = 1000) -> str:
     """
     将 API 返回的数据转换为对 LLM 友好的格式（主要处理 DataFrame 转 Markdown）。
     加入防爆截断（Token Protection）。

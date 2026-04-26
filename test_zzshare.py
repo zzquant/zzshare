@@ -16,23 +16,22 @@ api = DataApi(
 
 # 直接打印出 api 支持的所有接口名字
 # print([method for method in dir(api) if not method.startswith('_')])
-# git tag v0.3.7
-# git push origin v0.3.7
+# git tag v0.3.9
+# git push origin v0.3.9
 
 # 获取日线行情
 # df = api.daily(ts_code='920978.BJ', start_date='20250101', end_date='20250131')
 # print(df)
-
-
 
 df = api.daily(ts_code='000001', start_date='20260302', end_date='20260331')
 print(df)
 
 df = api.daily(
     ts_code='600871',
-    start_date='20260101',
+    start_date='20050101',
     end_date='20260203',
-    adj='qfq'
+    adj='qfq',
+
 )
 print(df)
 
@@ -41,7 +40,6 @@ print(df)
 
 df = api.daily(trade_date='20260410',limit=10, fields='ts_code,trade_date,open,close,high,low,volume,amount,adjustflag,turnoverrate')
 print(df)
-
 
 
 # # df = api.daily(trade_date='20260410',limit=10000, fields='all') 

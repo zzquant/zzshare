@@ -14,14 +14,20 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help="支持的量化数据接口")
     
     # 手动添加几个核心的，方便给更好的 help
-    daily_parser = subparsers.add_parser("daily", help="获取日线行情数据")
+    daily_parser = subparsers.add_parser(
+        "daily", 
+        help="获取日线行情数据",
+        description="获取 A 股日线行情。支持单股历史区间查询和全市场特定交易日快照查询。",
+        epilog="注意：API 能够获取的数据量取决于 limit 参数(1-1000)；为保护上下文，CLI 打印时超过 1000 行将自动截断。"
+    )
     daily_parser.add_argument("--ts_code", type=str, help="股票代码, e.g., 000001.SZ")
-    daily_parser.add_argument("--trade_date", type=str, help="交易日期 YYYYMMDD")
     daily_parser.add_argument("--start_date", type=str, help="起始日期")
-    daily_parser.add_argument("--limit", type=int, help="数量限制")
-    daily_parser.add_argument("--offset", type=int, help="偏移量")
+    daily_parser.add_argument("--end_date", type=str, help="结束日期")
+    daily_parser.add_argument("--trade_date", type=str, help="交易日期 YYYYMMDD")
+    daily_parser.add_argument("--limit", type=int, help="数量限制。获取全市场快照时建议 1-6000；获取单股区间时取值范围(1-1000，默认 1000)。注意：超过 1000 条输出将智能截断。获取更多需要配合 offset 参数分页获取。")
+    daily_parser.add_argument("--offset", type=int, help="偏移量。配合 limit 分页使用，取值范围为 >= 0 的整数(0-1000)。比如按照每次取1000条, 第二页offset=1000,limit=1000")
 
-    # Mins
+    # Mins 
     mins_parser = subparsers.add_parser("stk_mins", help="获取分钟级 K 线数据")
     mins_parser.add_argument("--ts_code", type=str, required=True, help="股票代码, e.g., 600519.SH")
     mins_parser.add_argument("--freq", type=str, default="1min", help="频率: 1min, 5min, 15min, 30min, 60min")
@@ -137,7 +143,7 @@ def main():
         
         if args.format == 'markdown':
             # 使用 AI Utils 转换（会自动截断过长的表防止刷爆控制台）
-            print(format_to_llm(res, max_rows=100))
+            print(format_to_llm(res))
         else:
             # 完整输出 JSON
             import pandas as pd

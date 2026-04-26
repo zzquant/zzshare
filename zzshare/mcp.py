@@ -40,7 +40,7 @@ def get_daily_market_data(
     try:
         # SDK 原生支持：若查询失败会抛出 ApiRateLimitError 等
         df = daily(ts_code=ts_code, trade_date=trade_date, start_date=start_date, end_date=end_date, limit=limit)
-        return format_to_llm(df, max_rows=100)
+        return format_to_llm(df)
     except ApiRateLimitError as e:
         return str(e)
     except ApiAuthError as e:
@@ -58,7 +58,7 @@ def get_stock_basic_info(ts_code: str = None, name: str = None) -> str:
     """
     try:
         df = stock_basic(ts_code=ts_code, name=name)
-        return format_to_llm(df, max_rows=50)
+        return format_to_llm(df)
     except Exception as e:
         return f"接口执行异常: {e}"
 
@@ -84,7 +84,7 @@ def get_minute_market_data(
     api = DataApi()
     try:
         df = api.stk_mins(ts_code=ts_code, start_time=start_time, end_time=end_time, freq=freq, limit=limit)
-        return format_to_llm(df, max_rows=100)
+        return format_to_llm(df)
     except Exception as e:
         return f"接口执行异常: {e}"
 
@@ -107,7 +107,7 @@ def _create_dynamic_mcp_tool(shortcut_name: str, params_list: List[str], desc: s
         try:
             method = getattr(api, shortcut_name)
             res = method(**kwargs)
-            return format_to_llm(res, max_rows=60)
+            return format_to_llm(res)
         except ApiRateLimitError as e:
             return str(e)
         except ApiAuthError as e:

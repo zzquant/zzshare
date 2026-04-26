@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "zzshare"
-version = "0.3.8"
+version = "0.3.9"
 description = "A股量化数据接口 SDK - 免费、开箱即用的量化数据接口"
 readme = "README.md"
 requires-python = ">=3.8"
