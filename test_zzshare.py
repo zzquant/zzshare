@@ -16,8 +16,8 @@ api = DataApi(
 
 # 直接打印出 api 支持的所有接口名字
 # print([method for method in dir(api) if not method.startswith('_')])
-# git tag v0.3.9
-# git push origin v0.3.9
+# git tag v0.4.1
+# git push origin v0.4.1
 
 # 获取日线行情
 # df = api.daily(ts_code='920978.BJ', start_date='20250101', end_date='20250131')
@@ -78,3 +78,6 @@ print(df)
 # stocks = api.market_plate_stocks(plate_type=17, plate_code='801660',date1='20260416', limit=3)
 # print(stocks)
 
+# 同花顺全A,主要用来查看全市场成交量
+response = api.plate_kline(b_code="883957", date1="20260101", date2="20260428")
+print(response)

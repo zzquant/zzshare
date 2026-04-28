@@ -22,7 +22,8 @@ def get_daily_market_data(
     trade_date: str = None, 
     start_date: str = None, 
     end_date: str = None, 
-    limit: int = 500
+    limit: int = 1000,
+    offset: int = 0
 ) -> str:
     """
     获取 A 股全市场或单只股票的日线级别的历史 K 线数据。
@@ -32,14 +33,15 @@ def get_daily_market_data(
     - trade_date: 特定交易日，格式 YYYYMMDD，如 '20260416'。
     - start_date: 开始日期，格式 YYYYMMDD。
     - end_date: 结束日期，格式 YYYYMMDD。
-    - limit: 返回最大数据条数，防止撑爆上下文。
+    - limit: 返回条数。单股上限 1000（默认 1000），全市场上限 10000（建议 6000）。
+    - offset: 偏移量，用于分页获取更深的历史数据（每页建议 1000）。
     
     返回:
     Markdown 表格格式的日线数据。
     """
     try:
         # SDK 原生支持：若查询失败会抛出 ApiRateLimitError 等
-        df = daily(ts_code=ts_code, trade_date=trade_date, start_date=start_date, end_date=end_date, limit=limit)
+        df = daily(ts_code=ts_code, trade_date=trade_date, start_date=start_date, end_date=end_date, limit=limit, offset=offset)
         return format_to_llm(df)
     except ApiRateLimitError as e:
         return str(e)
@@ -98,10 +100,6 @@ def _create_dynamic_mcp_tool(shortcut_name: str, params_list: List[str], desc: s
     for p in params_list:
         docstring += f"- {p}: {get_param_annotation(p)}\n"
         
-    # 为了让 LLM 获得良好的无签名函数支持，我们使用 __name__ 和 __doc__ 让 FastMCP 尽量提取信息
-    # FastMCP 对于只包含 **kwargs 的处理可能无法拿到细化参数。
-    # 我们可以用更直接的方法：直接操作 mcp 底层的 tools，但为了不破坏 FastMCP，使用 kwargs 配合详细 docstring 也是可行的，主流 LLM 会阅读 docstring 决定传什么 JSON。
-    
     def dynamic_tool(**kwargs: str) -> str:
         api = DataApi()
         try:

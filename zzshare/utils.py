@@ -43,3 +43,12 @@ def kline_data_to_df(data):
         })
 
     return pd.DataFrame(records)
+
+
+def plate_kline_to_df(data):
+    if not data:
+        return pd.DataFrame()
+    df = pd.DataFrame(data)
+    if not df.empty and 'date' in df.columns:
+        df['trade_date'] = pd.to_datetime(df['date']).dt.strftime('%Y%m%d')
+    return df

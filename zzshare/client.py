@@ -3,7 +3,7 @@ from typing import Any, Optional, Dict, Callable, List, Union
 import pandas as pd
 
 from zzshare.core import BaseDataApi
-from zzshare.utils import kline_data_to_df
+from zzshare.utils import kline_data_to_df, plate_kline_to_df
 from zzshare.logger import logger
 
 
@@ -68,6 +68,12 @@ class DataApi(BaseDataApi):
             ["code", "date1", "date2"],
             kline_data_to_df,
             "获取日线行情数据"
+        ),
+        "plate_kline": (
+            "v3/market/kline/plate/{b_code}",
+            ["b_code", "date1", "date2"],
+            plate_kline_to_df,
+            "获取指定板块的日线行情数据（例如同花顺全A 883957，主要用来查看全市场成交量）"
         ),
         # Base Data
         "trade_days": (

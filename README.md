@@ -414,6 +414,9 @@ rank = api.plates_rank(plate_type=17, date1='20250205', limit=20)
 
 # 获取板块成分股(按照板块个股人气排名)
 stocks = api.market_plate_stocks(plate_type=17, plate_code='801660', date1='20260416', limit=5)
+
+# 获取指定板块的日线行情数据（例如同花顺全A，代码 883957，主要用来查看全市场成交量）
+plate_kline = api.plate_kline(b_code="883957", date1="20240101", date2="20260428")
 ```
 
 ### 情绪指标
@@ -492,6 +495,7 @@ trend = api.sentiment_trend(model=1, date1='20250205')
 | :-------- | :--------------------- | :---------------------------------------------------------------------------------------- | :-------- |
 | `daily`   | 日线行情（tushare 兼容）   | `ts_code`, `trade_date`, `start_date`, `end_date`, `offset`, `limit`, `fields`, `adj`                          | DataFrame |
 | `stk_mins` | 分钟K线（tushare 兼容） | `ts_code`, `freq`, `trade_time`, `start_time`, `end_time`                                                | DataFrame |
+| `plate_kline` | 指定板块日线行情(如同花顺全A) | `b_code`, `date1`, `date2`                                                | DataFrame |
 
 ### 热度数据
 
