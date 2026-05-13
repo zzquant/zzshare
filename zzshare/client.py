@@ -57,10 +57,16 @@ class DataApi(BaseDataApi):
             "市场风格评估数据,适合什么风格的市场,量化出来的K线数据"
         ),
         "open_sentiment_data": (
-            "open/sentiment/data",
+            "v3/sentiment/data",
             ["date1", "date2"],
             None,
             "多维情绪聚合数据接口"
+        ),
+        "sentiment_timing": (
+            "v3/sentiment/timing",
+            ["date1", "date2"],
+            None,
+            "获取 VIP 择时信号数据（需 sentiment_vip 权限）"
         ),
         # Kline
         "daily": (
@@ -320,7 +326,12 @@ class DataApi(BaseDataApi):
                     processor: Optional[Callable[[Optional[Dict]], Any]] = post_process,
                     desc: str = description
             ):
-                def shortcut_method(**kwargs) -> Any:
+                def shortcut_method(*args, **kwargs) -> Any:
+                    # 将 positional arguments 映射到 params_list
+                    for i, val in enumerate(args):
+                        if i < len(params_list):
+                            kwargs[params_list[i]] = val
+
                     path = template
                     # 先处理路径参数：从 kwargs 中 pop 并替换 {xxx}
                     for param in params_list:

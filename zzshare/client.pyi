@@ -70,6 +70,12 @@ class DataApi:
         date2: Optional[str] = None
     ) -> Any: ...
 
+    def sentiment_timing(
+        self,
+        date1: str,
+        date2: Optional[str] = None
+    ) -> Any: ...
+
     def rt_k(
         self,
         ts_code: str = '',

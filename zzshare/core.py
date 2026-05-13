@@ -52,7 +52,12 @@ class BaseDataApi:
                     processor: Optional[Callable[[Optional[Dict]], Any]] = post_process,
                     desc: str = description
             ):
-                def shortcut_method(**kwargs) -> Any:
+                def shortcut_method(*args, **kwargs) -> Any:
+                    # 将 positional arguments 映射到 params_list
+                    for i, val in enumerate(args):
+                        if i < len(params_list):
+                            kwargs[params_list[i]] = val
+
                     path = template
                     # 先处理路径参数：从 kwargs 中 pop 并替换 {xxx}
                     for param in params_list:
