@@ -49,6 +49,10 @@ def plate_kline_to_df(data):
     if not data:
         return pd.DataFrame()
     df = pd.DataFrame(data)
-    if not df.empty and 'date' in df.columns:
-        df['trade_date'] = pd.to_datetime(df['date']).dt.strftime('%Y%m%d')
+    if not df.empty:
+        # 兼容多种日期列名
+        for col in ['date', 'trade_date', 'date1']:
+            if col in df.columns:
+                df['trade_date'] = pd.to_datetime(df[col]).dt.strftime('%Y%m%d')
+                break
     return df

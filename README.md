@@ -522,6 +522,15 @@ trend = api.sentiment_trend(model=1, date1='20250205')
 | `lhb_stock_history`  | 个股龙虎榜历史 | `stock_code`, `trader_name`                                  |
 | `lhb_trader_history` | 席位交易历史  | `trader_name`, `trader_id`, `stock_code`, `page`, `per_page` |
 
+### 题材库数据
+
+| 方法名 | 描述 | 参数 |
+| :--- | :--- | :--- |
+| `topic_table_list` | 获取题材库表格列表 | `page`, `limit`, `brief` |
+| `topic_table_detail` | 获取题材库表格详情 | `tid` |
+| `topic_table_stocks` | 获取题材下个股列表 | `tid` |
+| `topic_kline` | 获取题材合成指数K线 | `tid`, `start_date` |
+
 ### 实时数据
 
 | 方法名           | 描述     | 参数                                 |

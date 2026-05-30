@@ -295,7 +295,7 @@ class DataApi(BaseDataApi):
         # Topic Table
         "topic_table_list": (
             "v3/topic/tables",
-            ["page", "limit", "brief"],
+            {"page": 1, "limit": 20, "brief": 1},
             None,
             "获取题材库表格列表"
         ),
@@ -304,6 +304,18 @@ class DataApi(BaseDataApi):
             ["tid"],
             None,
             "获取题材库表格的详细行数据内容"
+        ),
+        "topic_table_stocks": (
+            "v3/topic/table/{tid}/stocks",
+            ["tid"],
+            None,
+            "获取题材库下关联的个股列表"
+        ),
+        "topic_kline": (
+            "v3/topic/table/{tid}/kline",
+            ["tid", "start_date"],
+            plate_kline_to_df,
+            "获取题材合成指数的 K 线数据"
         ),
     }
 
@@ -322,19 +334,29 @@ class DataApi(BaseDataApi):
 
             def make_method(
                     template: str = path_template,
-                    params_list: List[str] = param_names,
+                    params_list: Union[List[str], Dict[str, Any]] = param_names,
                     processor: Optional[Callable[[Optional[Dict]], Any]] = post_process,
                     desc: str = description
             ):
+                # 识别参数名列表
+                actual_params = list(params_list.keys()) if isinstance(params_list, dict) else params_list
+
                 def shortcut_method(*args, **kwargs) -> Any:
-                    # 将 positional arguments 映射到 params_list
+                    
+                    # 1. 应用默认值 (如果是字典)
+                    if isinstance(params_list, dict):
+                        for k, v in params_list.items():
+                            if k not in kwargs:
+                                kwargs[k] = v
+
+                    # 2. 将 positional arguments 映射到 actual_params
                     for i, val in enumerate(args):
-                        if i < len(params_list):
-                            kwargs[params_list[i]] = val
+                        if i < len(actual_params):
+                            kwargs[actual_params[i]] = val
 
                     path = template
-                    # 先处理路径参数：从 kwargs 中 pop 并替换 {xxx}
-                    for param in params_list:
+                    # 3. 处理路径参数：从 kwargs 中 pop 并替换 {xxx}
+                    for param in actual_params:
                         placeholder = f"{{{param}}}"
                         if placeholder in path:
                             if param not in kwargs:
@@ -355,7 +377,7 @@ class DataApi(BaseDataApi):
                 shortcut_method.__doc__ = (
                     f"{desc}\n\n"
                     f"API路径：{template}\n"
-                    f"参数：{', '.join(params_list)}（路径参数会自动替换）\n"
+                    f"参数：{', '.join(actual_params)}（路径参数会自动替换）\n"
                 )
                 setattr(self, name, shortcut_method)
 
@@ -430,7 +452,7 @@ class DataApi(BaseDataApi):
 
         url = f"{self.http_url}/v3/market/kline/realtime"
         try:
-            response = requests.get(url, params=params, headers=self.headers, timeout=self.timeout)
+            response = self._request_with_retry(url, params=params)
             response.raise_for_status()
             data = response.json().get("data", {}).get("list", [])
         except Exception as e:
@@ -517,7 +539,7 @@ class DataApi(BaseDataApi):
         params.update(kwargs)
         data: Optional[Union[Dict[str, Any], List[Any]]] = None
         try:
-            res = requests.get(url, params=params, headers=self.headers, timeout=self.timeout)
+            res = self._request_with_retry(url, params=params)
             if res.status_code == 200:
                 body = res.json()
                 if isinstance(body, dict):
@@ -674,7 +696,7 @@ class DataApi(BaseDataApi):
 
         data: Optional[Union[Dict[str, Any], List[Any]]] = None
         try:
-            res = requests.get(url, params=params, headers=self.headers, timeout=self.timeout)
+            res = self._request_with_retry(url, params=params)
             if res.status_code == 200:
                 body = res.json()
                 if isinstance(body, dict):

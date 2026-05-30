@@ -16,8 +16,8 @@ api = DataApi(
 
 # 直接打印出 api 支持的所有接口名字
 # print([method for method in dir(api) if not method.startswith('_')])
-# git tag v0.4.2
-# git push origin v0.4.2
+# git tag v0.4.3
+# git push origin v0.4.3
 
 # 获取日线行情
 # df = api.daily(ts_code='920978.BJ', start_date='20250101', end_date='20250131')
@@ -25,17 +25,17 @@ api = DataApi(
 
 
 
-df = api.daily(ts_code='000001', start_date='20260302', end_date='20260331')
-print(df)
+# df = api.daily(ts_code='000001', start_date='20260302', end_date='20260331')
+# print(df)
 
-df = api.daily(
-    ts_code='600871',
-    start_date='20050101',
-    end_date='20260203',
-    adj='qfq',
+# df = api.daily(
+#     ts_code='600871',
+#     start_date='20050101',
+#     end_date='20260203',
+#     adj='qfq',
 
-)
-print(df)
+# )
+# print(df)
 
 df = api.daily(trade_date='20260331',limit=10)
 print(df)
@@ -89,4 +89,8 @@ print(df)
 #情绪数据
 # print(api.open_sentiment_data("20260511","20260513"))
 # print(api.sentiment_timing("20260511","20260513"))
-# 
+#题材数据
+# print(api.topic_table_list())
+# print(api.topic_table_stocks(92))
+# print(api.topic_table_detail(92))
+# print(api.topic_kline(92))

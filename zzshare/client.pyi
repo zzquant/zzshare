@@ -298,7 +298,12 @@ class DataApi:
         self,
         page: int = 1,
         limit: int = 20,
-        brief: int = 0
+        brief: int = 1
     ) -> Any: ...
 
     def topic_table_detail(self, tid: int) -> Any: ...
+    
+    def topic_table_stocks(self, tid: int) -> Any: ...
+    
+    def topic_kline(self, tid: int, start_date: Optional[str] = None) -> DataFrame: ...
+    

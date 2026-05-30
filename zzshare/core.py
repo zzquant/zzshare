@@ -87,38 +87,77 @@ class BaseDataApi:
 
             make_method()
 
+    def _request_with_retry(self, url: str, params: Optional[Dict] = None, max_retries: int = 3) -> requests.Response:
+        import time
+        retries = 0
+        backoff = 2
+        while True:
+            try:
+                res = requests.get(
+                    url,
+                    params=params,
+                    headers=self.headers,
+                    timeout=self.timeout
+                )
+                if res.status_code == 429:
+                    retries += 1
+                    if retries > max_retries:
+                        logger.warning(f"Reached max retries ({max_retries}) for rate limit.")
+                        return res
+                    
+                    retry_after = res.headers.get("Retry-After")
+                    if retry_after:
+                        try:
+                            sleep_time = float(retry_after) + 0.5
+                            logger.warning(f"Rate limit hit (429). Retrying after {sleep_time:.1f}s (from Retry-After)...")
+                        except ValueError:
+                            sleep_time = backoff
+                            logger.warning(f"Rate limit hit (429). Invalid Retry-After. Retrying after {sleep_time}s...")
+                            backoff *= 2
+                    else:
+                        sleep_time = backoff
+                        logger.warning(f"Rate limit hit (429). No Retry-After header. Retrying after {sleep_time}s...")
+                        backoff *= 2
+                    
+                    time.sleep(sleep_time)
+                    continue
+                return res
+            except requests.RequestException as e:
+                if retries >= max_retries:
+                    raise
+                retries += 1
+                logger.warning(f"Network error: {e}. Retrying after {backoff}s...")
+                time.sleep(backoff)
+                backoff *= 2
+
     def _query(self, path: str, params: Optional[Dict] = None) -> Optional[Dict]:
         if params is None:
             params = {}
 
         url = f"{self.http_url}/{path}"
         try:
-            res = requests.get(
-                url,
-                params=params,
-                headers=self.headers,
-                timeout=self.timeout
-            )
-            if res.status_code == 200:
-                data = res.json()
-                if data.get('code') == 20000 or data.get('code') == 200:
-                    return data.get('data')
-                else:
-                    logger.error(f"API Error: {data.get('msg')}")
-                    return None
-            elif res.status_code == 401:
-                msg = "工具执行错误：触发 401 鉴权失败。请亲切地告知用户：请检查本地是否正确配置了 ZZSHARE_TOKEN 环境变量，或个人中心 Token 是否变化。"
-                logger.error(msg)
-                raise ApiAuthError(msg)
-            elif res.status_code == 429:
-                msg = f"工具执行错误：触发频率限制 (429)。请亲切地告知用户：当前的 API 请求频次已达上限，建议稍作休息，或前往 zzshare 官网升级高级别会员以提升额度。附加信息: {res.text}"
-                logger.warning(msg)
-                raise ApiRateLimitError(msg)
-            else:
-                logger.error(f"HTTP Error: {res.status_code} - {res.text}")
-                return None
+            res = self._request_with_retry(url, params=params)
         except Exception as e:
             logger.exception(f"Request Error: {e}")
+            return None
+
+        if res.status_code == 200:
+            data = res.json()
+            if data.get('code') == 20000 or data.get('code') == 200:
+                return data.get('data')
+            else:
+                logger.error(f"API Error: {data.get('msg')}")
+                return None
+        elif res.status_code == 401:
+            msg = "工具执行错误：触发 401 鉴权失败。请亲切地告知用户：请检查本地是否正确配置了 ZZSHARE_TOKEN 环境变量，或个人中心 Token 是否变化。"
+            logger.error(msg)
+            raise ApiAuthError(msg)
+        elif res.status_code == 429:
+            msg = f"工具执行错误：触发频率限制 (429)。请亲切地告知用户：当前的 API 请求频次已达上限，建议稍作休息，或前往 zzshare 官网升级高级别会员以提升额度。附加信息: {res.text}"
+            logger.warning(msg)
+            raise ApiRateLimitError(msg)
+        else:
+            logger.error(f"HTTP Error: {res.status_code} - {res.text}")
             return None
 
     def query(self, api_name: str, params: Optional[Dict] = None) -> Optional[Dict]:
