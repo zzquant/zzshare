@@ -16,8 +16,9 @@ api = DataApi(
 
 # 直接打印出 api 支持的所有接口名字
 # print([method for method in dir(api) if not method.startswith('_')])
-# git tag v0.4.3
-# git push origin v0.4.3
+# 注意检查 pyproject.toml 中的 version 是否与实际版本一致
+# git tag v0.4.5
+# git push origin v0.4.5
 
 # 获取日线行情
 # df = api.daily(ts_code='920978.BJ', start_date='20250101', end_date='20250131')
