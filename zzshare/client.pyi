@@ -102,6 +102,7 @@ class DataApi:
         start_time: Optional[str] = None,
         end_time: Optional[str] = None,
         freq: str = "1min",
+        count: Optional[int] = None,
         **kwargs: Any
     ) -> DataFrame: ...
 

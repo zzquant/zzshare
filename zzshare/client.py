@@ -675,6 +675,7 @@ class DataApi(BaseDataApi):
         start_time: Optional[str] = None,
         end_time: Optional[str] = None,
         freq: str = "1min",
+        count: Optional[int] = None,
         **kwargs: Any
     ):
         use_ts_code = self._to_tushare_ts_code(ts_code) if ts_code else None
@@ -690,6 +691,8 @@ class DataApi(BaseDataApi):
             params["start_time"] = start_time
         if end_time:
             params["end_time"] = end_time
+        if count is not None:
+            params["count"] = count
 
         params.update(kwargs)
         url = f"{self.http_url}/v3/market/kline/minute/{use_ts_code}"

@@ -17,8 +17,8 @@ api = DataApi(
 # 直接打印出 api 支持的所有接口名字
 # print([method for method in dir(api) if not method.startswith('_')])
 # 注意检查 pyproject.toml 中的 version 是否与实际版本一致
-# git tag v0.4.5
-# git push origin v0.4.5
+# git tag v0.4.6
+# git push origin v0.4.6
 
 # 获取日线行情
 # df = api.daily(ts_code='920978.BJ', start_date='20250101', end_date='20250131')
@@ -89,9 +89,6 @@ print(df)
 # print(api.updown_distribution("20260513"))
 #情绪数据
 # print(api.open_sentiment_data("20260511","20260513"))
-# print(api.sentiment_timing("20260511","20260513"))
+# print(api.sentiment_timing("20260601","20260601"))
 #题材数据
 # print(api.topic_table_list())
-# print(api.topic_table_stocks(92))
-# print(api.topic_table_detail(92))
-# print(api.topic_kline(92))

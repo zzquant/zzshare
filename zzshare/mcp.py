@@ -71,7 +71,7 @@ def get_minute_market_data(
     start_time: str = None,
     end_time: str = None,
     freq: str = "1min",
-    limit: int = 100
+    count: int = 10
 ) -> str:
     """
     获取股票的分钟级别 K 线数据。建议在需要观察盘中精细走势时使用。
@@ -81,11 +81,11 @@ def get_minute_market_data(
     - start_time: 开始时间，格式 YYYYMMDDHHMM (可选)
     - end_time: 结束时间，格式 YYYYMMDDHHMM (可选)
     - freq: 分钟频率，支持 '1min', '5min', '15min', '30min', '60min'
-    - limit: 返回数据量限制
+    - count: 返回数据量限制，默认 10，最大值 1000
     """
     api = DataApi()
     try:
-        df = api.stk_mins(ts_code=ts_code, start_time=start_time, end_time=end_time, freq=freq, limit=limit)
+        df = api.stk_mins(ts_code=ts_code, start_time=start_time, end_time=end_time, freq=freq, count=count)
         return format_to_llm(df)
     except Exception as e:
         return f"接口执行异常: {e}"

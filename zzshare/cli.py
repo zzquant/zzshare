@@ -33,7 +33,7 @@ def main():
     mins_parser.add_argument("--freq", type=str, default="1min", help="频率: 1min, 5min, 15min, 30min, 60min")
     mins_parser.add_argument("--start_time", type=str, help="开始时间 YYYYMMDDHHMM")
     mins_parser.add_argument("--end_time", type=str, help="结束时间 YYYYMMDDHHMM")
-    mins_parser.add_argument("--limit", type=int, help="数量限制")
+    mins_parser.add_argument("--count", type=int, help="数量限制")
 
     # Plates Rank
     pr_parser = subparsers.add_parser("plates_rank", help="获取全市场所有板块的热度排名")

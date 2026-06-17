@@ -64,10 +64,12 @@ pip install zzshare --upgrade
 
 **使用 API Token 初始化：**
 
+> 💡 **提示**：[可选,需要提高访问频率时使用] 接口 Token 可在官网个人资料页面 [点此免费获取](https://quant.zizizaizai.com/me/profile?tab=2&invite_code=E22541A0)。
+
 ```python
 from zzshare.client import DataApi
 
-# [可选,提高访问频率使用]Token 可在官网个人资料页面获取(https://quant.zizizaizai.com/me/profile)
+# Token 可在官网个人资料页面免费获取
 api = DataApi(token='your_api_token_here')
 
 # 获取日线行情
