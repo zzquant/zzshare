@@ -69,7 +69,7 @@ pip install zzshare --upgrade
 ```python
 from zzshare.client import DataApi
 
-# Token 可在官网个人资料页面免费获取
+# Token 可在官网个人资料页面免费获取,不传递则匿名使用(调用频率限制比较低)
 api = DataApi(token='your_api_token_here')
 
 # 获取日线行情
