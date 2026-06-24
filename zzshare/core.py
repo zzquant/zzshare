@@ -15,7 +15,7 @@ class ApiRateLimitError(Exception):
 
 class BaseDataApi:
     def __init__(self, token: str = '', timeout: int = 10, http_url: str = 'https://api.zizizaizai.com'):
-        self.token = token or os.environ.get('ZZSHARE_TOKEN', '')
+        self.token = token or os.environ.get('ZZSHARE_TOKEN', '') or 'anonymous'
         self.timeout = timeout
         self.http_url = http_url.rstrip('/')
 

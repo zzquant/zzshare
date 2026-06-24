@@ -115,7 +115,6 @@ basic = api.stock_basic(exchange='SSE', list_status='L', fields='ts_code,symbol,
 | **龙虎榜单** | `lhb_list`, `lhb_detail`, `lhb_stock_history` | 龙虎榜列表、个股详情、席位交易历史 |
 | **情绪热度** | `market_sentiment`, `sentiment_trend`, `ths_hot_top` | 市场情绪指标、情绪趋势、同花顺热度 |
 | **板块分析** | `plates_list`, `plates_rank` | 行业/概念板块列表、排名、热门成分股 |
-| **资金流向** | `stock_moneyflow`, `market_mf` | 个股实时资金流向、市场分钟级资金监控 |
 
 > 💡 共计 **40+** 个已实现接口，完整列表见下方。
 
