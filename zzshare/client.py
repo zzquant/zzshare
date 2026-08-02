@@ -3,7 +3,7 @@ from typing import Any, Optional, Dict, Callable, List, Union
 import pandas as pd
 
 from zzshare.core import BaseDataApi
-from zzshare.utils import kline_data_to_df, plate_kline_to_df
+from zzshare.utils import kline_data_to_df, plate_kline_to_df, finance_data_to_df
 from zzshare.logger import logger
 
 
@@ -28,7 +28,7 @@ class DataApi(BaseDataApi):
         # Sentiment Data
         "market_plate_stocks": (
             "v3/market/plates/{plate_type}/{plate_code}/stocks/rank",
-            ["plate_type", "plate_code", "date1", "is_real", "limit"],
+            {"plate_type": 17, "plate_code": None, "date1": None, "is_real": 1, "limit": 50},
             None,
             "获取特定板块内的成分股,按照人气排名"
         ),
@@ -126,6 +126,12 @@ class DataApi(BaseDataApi):
             "全市场涨停复盘：包含个股具体的涨停原因与逻辑分析"
         ),
         "review_uplimit_hot_step": (
+            "v3/open/review/uplimit/hot",
+            ["date1", "board", "limit"],
+            None,
+            "指定板块下的涨停梯队"
+        ),
+        "review_uplimit_hot_open": (
             "v3/open/review/uplimit/hot",
             ["date1", "board", "limit"],
             None,
@@ -317,6 +323,62 @@ class DataApi(BaseDataApi):
             plate_kline_to_df,
             "获取题材合成指数的 K 线数据"
         ),
+        # Fundamental Data
+        "finance_valuation": (
+            "v3/fundamentals/valuation/{date_value}",
+            ["date_value"],
+            finance_data_to_df,
+            "获取指定交易日（如 2024-12-31）的股票估值日频数据"
+        ),
+        "finance_indicator": (
+            "v3/fundamentals/indicator/{date_value}",
+            ["date_value"],
+            finance_data_to_df,
+            "获取指定季度（如 2024q4 或 2024-12-31）的财务指标数据"
+        ),
+        "finance_income": (
+            "v3/fundamentals/income/{date_value}",
+            ["date_value"],
+            finance_data_to_df,
+            "获取指定季度（如 2024q4 或 2024-12-31）的利润表数据"
+        ),
+        "finance_balance": (
+            "v3/fundamentals/balance/{date_value}",
+            ["date_value"],
+            finance_data_to_df,
+            "获取指定季度（如 2024q4 或 2024-12-31）的资产负债表数据"
+        ),
+        "finance_cash_flow": (
+            "v3/fundamentals/cash_flow/{date_value}",
+            ["date_value"],
+            finance_data_to_df,
+            "获取指定季度（如 2024q4 或 2024-12-31）的现金流量表数据"
+        ),
+        # Fundamental Data - Advanced Queries
+        "finance_pit": (
+            "v3/fundamentals/{table}/pit/{trade_date}",
+            ["table", "trade_date"],
+            finance_data_to_df,
+            "Point-in-time 查询：给定交易日，返回每只股票在该日之前最新已发布的财务数据（回测核心）"
+        ),
+        "finance_range": (
+            "v3/fundamentals/{table}/range",
+            ["table"],
+            finance_data_to_df,
+            "日期区间查询：返回指定范围内的财务数据（降序）"
+        ),
+        "finance_stock": (
+            "v3/fundamentals/{table}/stock/{code}",
+            ["table", "code"],
+            finance_data_to_df,
+            "单只股票的历史财务数据（降序）"
+        ),
+        "finance_latest": (
+            "v3/fundamentals/{table}/latest",
+            ["table"],
+            finance_data_to_df,
+            "获取最新的财务数据快照"
+        ),
     }
 
     def _register_shortcuts(self):
@@ -336,7 +398,8 @@ class DataApi(BaseDataApi):
                     template: str = path_template,
                     params_list: Union[List[str], Dict[str, Any]] = param_names,
                     processor: Optional[Callable[[Optional[Dict]], Any]] = post_process,
-                    desc: str = description
+                    desc: str = description,
+                    method_name: str = name  # 用默认参数解决闭包延迟绑定问题
             ):
                 # 识别参数名列表
                 actual_params = list(params_list.keys()) if isinstance(params_list, dict) else params_list
@@ -360,7 +423,7 @@ class DataApi(BaseDataApi):
                         placeholder = f"{{{param}}}"
                         if placeholder in path:
                             if param not in kwargs:
-                                raise ValueError(f"缺少路径参数 '{param}' for {name}")
+                                raise ValueError(f"缺少路径参数 '{param}' for {method_name}")
                             value = kwargs.pop(param)
                             path = path.replace(placeholder, str(value))
 
@@ -373,13 +436,13 @@ class DataApi(BaseDataApi):
                     return data
 
                 # 绑定方法名和文档
-                shortcut_method.__name__ = name
+                shortcut_method.__name__ = method_name
                 shortcut_method.__doc__ = (
                     f"{desc}\n\n"
                     f"API路径：{template}\n"
                     f"参数：{', '.join(actual_params)}（路径参数会自动替换）\n"
                 )
-                setattr(self, name, shortcut_method)
+                setattr(self, method_name, shortcut_method)
 
             make_method()
 

@@ -21,6 +21,7 @@
 - 🔄 **兼容 某些接口** - 接口规范兼容某些接口,比如tushare等。
 - ⚡ **实时数据** - 支持日线、分钟线、资金流向等盘中实时数据。
 - 🐍 **类型提示** - 完整的 `.pyi` 类型文件，IDE 自动补全。
+- 🏢 **财务基本面** - 提供估值数据、财务指标、利润表、资产负债表、现金流量表等 5 张核心财务大表（详见 [FUNDAMENTALS.md](FUNDAMENTALS.md)）。
 
 ***
 
@@ -115,6 +116,7 @@ basic = api.stock_basic(exchange='SSE', list_status='L', fields='ts_code,symbol,
 | **龙虎榜单** | `lhb_list`, `lhb_detail`, `lhb_stock_history` | 龙虎榜列表、个股详情、席位交易历史 |
 | **情绪热度** | `market_sentiment`, `sentiment_trend`, `ths_hot_top` | 市场情绪指标、情绪趋势、同花顺热度 |
 | **板块分析** | `plates_list`, `plates_rank` | 行业/概念板块列表、排名、热门成分股 |
+| **财务基本面** | `finance_valuation`, `finance_indicator`, `finance_pit`, `finance_range`, `finance_stock`, `finance_latest` 等 | 5 大核心表 + PIT/区间/单股/最新 4 种高级查询（详见 [FUNDAMENTALS.md](FUNDAMENTALS.md)） |
 
 > 💡 共计 **40+** 个已实现接口，完整列表见下方。
 
@@ -548,6 +550,59 @@ trend = api.sentiment_trend(model=1, date1='20250205')
 | `zdjk_get`               | 监控数据     | `date1`, `date2`                    |
 
 </details>
+
+***
+
+### 🏢 财务基本面数据 (Fundamentals)
+
+`zzshare` 支持查询 5 张常用的基本面和财务数据表。数据均自动转换为标准的 **pandas DataFrame** 结构，方便进行量化分析。
+
+- **详细字段说明**：关于每个接口的详细定义及包含的列字段，请参阅独立的详细介绍文档 [FUNDAMENTALS.md](FUNDAMENTALS.md)。
+
+```python
+# 查询日频估值数据（如 2024-12-31）
+df_val = api.finance_valuation("2024-12-31")
+
+# 查询季频财务指标数据（支持 '2024q4' 或 '2024-12-31' 报告期底格式）
+df_ind = api.finance_indicator("2024q4")
+
+# 查询利润表
+df_inc = api.finance_income("2024q4")
+
+# 查询资产负债表
+df_bal = api.finance_balance("2024q4")
+
+# 查询现金流量表
+df_cf = api.finance_cash_flow("2024q4")
+
+# ============================================================
+# Advanced Queries (Backtest Core)
+# ============================================================
+
+# Point-in-time: latest published data before trade date D (no look-ahead bias)
+df_pit = api.finance_pit(table="indicator", trade_date="2024-06-03")
+
+# Date range: batch pull across a date range (descending)
+df_range = api.finance_range(table="valuation", start_date="2024-01-01", end_date="2024-12-31")
+
+# Single stock: full financial history for one stock
+df_stock = api.finance_stock(table="balance", code="600519.SH")
+
+# Latest snapshot: newest available data
+df_latest = api.finance_latest(table="valuation")
+```
+
+### Advanced Query Methods
+
+| Method | Description | Parameters | Use Case |
+| :--- | :--- | :--- | :--- |
+| `finance_pit` | Point-in-time query | `table`, `trade_date`, `codes`, `source` | Backtest core, prevents look-ahead bias |
+| `finance_range` | Date range query | `table`, `start_date`, `end_date`, `codes`, `source`, `limit` | Panel data construction, batch pulls |
+| `finance_stock` | Single stock history | `table`, `code`, `start_date`, `end_date`, `source`, `limit` | Deep single-stock analysis |
+| `finance_latest` | Latest data snapshot | `table`, `codes`, `source` | Stock screening, real-time snapshot |
+
+> `table` param supports: `valuation` / `indicator` / `income` / `balance` / `cash_flow`
+
 
 ***
 

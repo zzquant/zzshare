@@ -48,8 +48,8 @@ print(df)
 # # df = api.daily(trade_date='20260410',limit=10000, fields='all') 
 # # print(df.shape) # 5495
 
-# # basic = api.stock_basic(exchange='', list_status='L', fields='ts_code,symbol,name,exchange,list_status')
-# # print(basic)
+basic = api.stock_basic(exchange='', list_status='L', fields='ts_code,symbol,name,exchange,list_status')
+print(basic)
 
 # #测试获取实时日K
 # # real_info =  api.rt_k("3*.SZ", fields="all")
@@ -92,3 +92,8 @@ print(df)
 # print(api.sentiment_timing("20260601","20260601"))
 #题材数据
 # print(api.topic_table_list())
+
+
+# 1. 查询 2024-12-31 的日频估值数据 (默认 source 为 jq)
+df_val = api.finance_valuation("2025-12-31")
+print(df_val.head())

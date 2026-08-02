@@ -149,6 +149,13 @@ class DataApi:
         limit: Optional[int] = None
     ) -> Any: ...
 
+    def review_uplimit_hot_open(
+        self,
+        date1: Optional[str] = None,
+        board: Optional[str] = None,
+        limit: Optional[int] = None
+    ) -> Any: ...
+
     def stock_uplimit_reason(
         self,
         stock_code: str,

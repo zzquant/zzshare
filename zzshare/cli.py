@@ -100,12 +100,45 @@ def main():
     tht_parser.add_argument("--date1", type=str, help="查询日期 (YYYYMMDD)")
     tht_parser.add_argument("--top_n", type=int, default=10, help="返回前 N 名")
     
+
+    # Finance PIT (Point-in-time)
+    fpit_parser = subparsers.add_parser("finance_pit", help="Point-in-time 财务查询（回测核心）")
+    fpit_parser.add_argument("--table", type=str, required=True, help="表名: valuation / indicator / income / balance / cash_flow")
+    fpit_parser.add_argument("--trade_date", type=str, required=True, help="交易日 (如 2024-12-31)")
+    fpit_parser.add_argument("--codes", type=str, help="股票代码，逗号分隔 (如 600519.SH,000001.SZ)")
+    fpit_parser.add_argument("--source", type=str, default="jq", help="数据源 (默认 jq)")
+
+    # Finance Range
+    frange_parser = subparsers.add_parser("finance_range", help="日期区间查询财务数据")
+    frange_parser.add_argument("--table", type=str, required=True, help="表名: valuation / indicator / income / balance / cash_flow")
+    frange_parser.add_argument("--start_date", type=str, required=True, help="起始日期 (如 2024-01-01)")
+    frange_parser.add_argument("--end_date", type=str, required=True, help="结束日期 (如 2024-12-31)")
+    frange_parser.add_argument("--codes", type=str, help="股票代码，逗号分隔")
+    frange_parser.add_argument("--source", type=str, default="jq", help="数据源 (默认 jq)")
+    frange_parser.add_argument("--limit", type=int, default=50000, help="返回条数上限")
+
+    # Finance Stock History
+    fstock_parser = subparsers.add_parser("finance_stock", help="单只股票的财务历史数据")
+    fstock_parser.add_argument("--table", type=str, required=True, help="表名: valuation / indicator / income / balance / cash_flow")
+    fstock_parser.add_argument("--code", type=str, required=True, help="股票代码 (如 600519.SH)")
+    fstock_parser.add_argument("--start_date", type=str, help="起始日期")
+    fstock_parser.add_argument("--end_date", type=str, help="结束日期")
+    fstock_parser.add_argument("--source", type=str, default="jq", help="数据源 (默认 jq)")
+    fstock_parser.add_argument("--limit", type=int, default=1000, help="返回条数上限")
+
+    # Finance Latest
+    flatest_parser = subparsers.add_parser("finance_latest", help="获取最新的财务数据快照")
+    flatest_parser.add_argument("--table", type=str, required=True, help="表名: valuation / indicator / income / balance / cash_flow")
+    flatest_parser.add_argument("--codes", type=str, help="股票代码，逗号分隔")
+    flatest_parser.add_argument("--source", type=str, default="jq", help="数据源 (默认 jq)")
+
     # 动态把 SHORTCUTS 塞进 CLI
     for name, entry in DataApi.SHORTCUTS.items():
         if name in [
             "daily", "stock_basic", "stk_mins", "plates_rank", "plates_rank_days", "plates_rank_days_new", 
             "sentiment_trend", "sentiment_trend_range", "market_sentiment", "market_hot_sentiment", 
-            "market_plate_popular_reason", "review_uplimit_hot_step", "ths_hot_top"
+            "market_plate_popular_reason", "review_uplimit_hot_step", "ths_hot_top",
+            "finance_pit", "finance_range", "finance_stock", "finance_latest"
         ]: 
             continue
             

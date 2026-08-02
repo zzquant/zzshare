@@ -56,3 +56,9 @@ def plate_kline_to_df(data):
                 df['trade_date'] = pd.to_datetime(df[col]).dt.strftime('%Y%m%d')
                 break
     return df
+
+
+def finance_data_to_df(data):
+    if not data:
+        return pd.DataFrame()
+    return pd.DataFrame(data)
