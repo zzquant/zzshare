@@ -2,8 +2,6 @@
 
 `zzshare` 支持查询五张核心的基本面和财务数据表。数据均转换为标准的 **pandas DataFrame** 结构，方便进行量化分析。
 
-所有查询方法均自动过滤掉后端专有的 `source` 字段，且不需要配置额外的环境变量参数，使用默认的极速并发加载引擎。
-
 ---
 
 ## 💡 快速入门
@@ -28,6 +26,7 @@ print(df_ind.head())
 ## 📊 接口、字段与公式详细说明
 
 ### 1. 估值日频表 (`finance_valuation`)
+
 * **调用方式**：`api.finance_valuation(date_value)`
 * **说明**：按交易日查询，`date_value` 传入交易日（如 `"2024-12-31"`）。
 
@@ -49,6 +48,7 @@ print(df_ind.head())
 ---
 
 ### 2. 财务指标季频表 (`finance_indicator`)
+
 * **调用方式**：`api.finance_indicator(date_value)`
 * **说明**：按报告期查询，`date_value` 可传季度简写（如 `"2024q4"`) 或具体期末日期（如 `"2024-12-31"`)。
 
@@ -67,15 +67,16 @@ print(df_ind.head())
 | `inc_net_profit_annual` | float | 净利润环比增长率 | $\frac{\text{本期归母净利润} - \text{上期归母净利润}}{\text{上期归母净利润}} \times 100\%$ | 相比上一季度归母净利润的增长速度，能够及时发现业绩拐点 |
 | `net_profit_margin` | float | 销售净利率 | $\frac{\text{净利润}}{\text{营业总收入}} \times 100\%$ | 销售收入中能真正留存转化为最终收益的比例 |
 | `gross_profit_margin` | float | 销售毛利率 | $\frac{\text{营业总收入} - \text{营业总成本}}{\text{营业总收入}} \times 100\%$ | 反映产品定价溢价能力与核心生产成本控制水平的关键门槛 |
-| `operating_profit_to_total_profit`| float | 营业利润占总利润比例 | $\frac{\text{营业利润}}{\text{利润总额}} \times 100\%$ | 比例越高代表盈利中来自日常经营的越稳健，主营业务地位越突显 |
+| `operating_profit_to_total_profit` | float | 营业利润占总利润比例 | $\frac{\text{营业利润}}{\text{利润总额}} \times 100\%$ | 比例越高代表盈利中来自日常经营的越稳健，主营业务地位越突显 |
 | `net_profit_to_total_profit` | float | 净利润占总利润比例 | $\frac{\text{净利润}}{\text{利润总额}} \times 100\%$ | 评估所得税、减值损失及非经常性支出的综合侵蚀或拉动效果 |
 | `adjusted_profit_to_total_profit` | float | 扣除非经常性损益后的净利润占总利润比例 | $\frac{\text{扣非归母净利润}}{\text{利润总额}} \times 100\%$ | 用来评估核心经营性利润在企业最终获取总利润中的真实比重 |
 | `net_profit_to_total_revenue` | float | 净利润占营业总收入比例 | $\frac{\text{净利润}}{\text{营业总收入}} \times 100\%$ | 营业收入最终产生净利润的转化比率 |
-| `adjusted_profit_to_total_revenue`| float | 扣非净利润占营业总收入比例 | $\frac{\text{扣非归母净利润}}{\text{营业总收入}} \times 100\%$ | 主营业务核心盈利相对最终所带来的营收总额的比率，反映最纯粹的销售利润转化效率 |
+| `adjusted_profit_to_total_revenue` | float | 扣非净利润占营业总收入比例 | $\frac{\text{扣非归母净利润}}{\text{营业总收入}} \times 100\%$ | 主营业务核心盈利相对最终所带来的营收总额的比率，反映最纯粹的销售利润转化效率 |
 
 ---
 
 ### 3. 利润表季频表 (`finance_income`)
+
 * **调用方式**：`api.finance_income(date_value)`
 
 | 字段名 | 类型 | 含义说明 | 公式 | 说明 |
@@ -110,6 +111,7 @@ print(df_ind.head())
 ---
 
 ### 4. 资产负债表季频表 (`finance_balance`)
+
 * **调用方式**：`api.finance_balance(date_value)`
 
 | 字段名 | 类型 | 含义说明 | 公式 | 说明 |
@@ -189,6 +191,7 @@ print(df_ind.head())
 ---
 
 ### 5. 现金流量表季频表 (`finance_cash_flow`)
+
 * **调用方式** ：`api.finance_cash_flow(date_value)`
 
 | 字段名 | 类型 | 含义说明 | 公式 | 说明 |
@@ -216,7 +219,6 @@ print(df_ind.head())
 | `cash_and_equivalents_increase` | float | 现金及现金等价物净增加额 | $\text{经营净额} + \text{投资净额} + \text{筹资净额} + \text{汇率影响}$ | 本会计期间公司货币资金及等价物的最终净流入/流出差额 |
 | `end_cash_balance` | float | 期末现金及现金等价物余额 | $\text{期初现金余额} + \text{现金等价物净增加额}$ | 本会计期末持有的随时可支取的货币现金及等价物余额（与资产负债表中现金资产核对） |
 | `begin_cash_balance` | float | 期初现金及现金等价物余额 | - | 本会计期初账面上所持有的货币现金与随时可变现的现金等价物余额 |
-
 
 ---
 
