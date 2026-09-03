@@ -635,28 +635,56 @@ class DataApi(BaseDataApi):
             normalized_rows: List[Dict[str, Any]] = []
             for row in records:
                 row_ts_code = row.get("ts_code") or row.get("symbol") or row.get("code") or data_ts_code or use_ts_code
+                row_close = row.get("close", row.get("c"))
+                row_prev_close = row.get("prev_close", row.get("pre_close"))
+                row_high = row.get("high", row.get("h"))
+                row_low = row.get("low", row.get("l"))
+                row_change = row.get("change")
+                if row_change is None and row_close is not None and row_prev_close is not None:
+                    try:
+                        row_change = round(float(row_close) - float(row_prev_close), 2)
+                    except Exception:
+                        pass
+
+                row_quote_rate = row.get("quote_rate", row.get("pct_chg", row.get("pct_change")))
+                row_amp_rate = row.get("amp_rate")
+                if candle_mode != 0 and row_prev_close:
+                    try:
+                        prev_f = float(row_prev_close)
+                        if prev_f > 0:
+                            if row_close is not None:
+                                calc_quote = round((float(row_close) - prev_f) / prev_f * 100, 4)
+                                if row_quote_rate is None or abs(float(row_quote_rate) - calc_quote) > 0.05:
+                                    row_quote_rate = calc_quote
+                            if row_high is not None and row_low is not None:
+                                calc_amp = round((float(row_high) - float(row_low)) / prev_f * 100, 4)
+                                if row_amp_rate is None or abs(float(row_amp_rate) - calc_amp) > 0.05:
+                                    row_amp_rate = calc_amp
+                    except Exception:
+                        pass
+
                 normalized_rows.append({
                     "ts_code": self._to_tushare_ts_code(str(row_ts_code)) if row_ts_code else None,
                     "trade_date": str(row.get("trade_date") or row.get("date") or row.get("day") or "").replace("-", ""),
                     "open": row.get("open", row.get("o")),
-                    "high": row.get("high", row.get("h")),
-                    "low": row.get("low", row.get("l")),
-                    "close": row.get("close", row.get("c")),
-                    "pre_close": row.get("pre_close", row.get("prev_close")),
-                    "change": row.get("change"),
-                    "pct_chg": row.get("pct_chg", row.get("pct_change", row.get("quote_rate"))),
+                    "high": row_high,
+                    "low": row_low,
+                    "close": row_close,
+                    "pre_close": row_prev_close,
+                    "change": row_change,
+                    "pct_chg": row_quote_rate,
                     "vol": row.get("vol", row.get("volume")),
                     "amount": row.get("amount", row.get("turnover")),
                     "volume": row.get("volume", row.get("vol")),
                     "turnover": row.get("turnover", row.get("amount")),
                     "factor": row.get("factor"),
-                    "prev_close": row.get("prev_close", row.get("pre_close")),
+                    "prev_close": row_prev_close,
                     "avg_price": row.get("avg_price"),
                     "high_limit": row.get("high_limit"),
                     "low_limit": row.get("low_limit"),
                     "turnover_rate": row.get("turnover_rate"),
-                    "amp_rate": row.get("amp_rate"),
-                    "quote_rate": row.get("quote_rate", row.get("pct_chg", row.get("pct_change"))),
+                    "amp_rate": row_amp_rate,
+                    "quote_rate": row_quote_rate,
                     "is_paused": row.get("is_paused"),
                     "is_st": row.get("is_st"),
                 })
