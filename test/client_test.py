@@ -19,7 +19,7 @@ class DataApiTest(unittest.TestCase):
 
     def setUp(self):
         self.api = DataApi(
-            token=os.getenv("ZZSHARE_TOKEN", "fake-token-for-test"),
+            token=os.getenv("ZZSHARE_TOKEN", ""),
             timeout=30,
             http_url=os.getenv("API_BASE_URL", "https://api.zizizaizai.com")
         )
@@ -148,6 +148,27 @@ class DataApiTest(unittest.TestCase):
 
     def test_review_uplimit_reason_open_simple(self):
         self._call_api_method("review_uplimit_reason_open", date1="2026-02-03")
+
+    def test_plates_stocks(self):
+        self._call_api_method("plates_stocks", plate_type=14, plate_code="881155")
+
+    def test_updown_distribution(self):
+        self._call_api_method("updown_distribution", date1="2026-02-03")
+
+    def test_uplimit_trend(self):
+        self._call_api_method("uplimit_trend", date1="2026-02-03")
+
+    def test_sentiment_bull_data(self):
+        self._call_api_method("sentiment_bull_data", date1="2026-02-01", date2="2026-02-03")
+
+    def test_uplimit_market_value(self):
+        self._call_api_method("uplimit_market_value", date1="2026-02-01", date2="2026-02-03")
+
+    def test_movement_alerts(self):
+        self._call_api_method("movement_alerts", date1="2026-02-03")
+
+    def test_zdjk_get(self):
+        self._call_api_method("zdjk_get", date1="2026-02-01", date2="2026-02-03")
 
     def test_stock_info_basic(self):
         if self.api.token == "fake-token-for-test":

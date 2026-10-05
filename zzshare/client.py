@@ -14,13 +14,13 @@ class DataApi(BaseDataApi):
     SHORTCUTS = {
         # Daily
         "uplimit_hot": (
-            "open/review/uplimit/hot",
+            "v3/open/review/uplimit/hot",
             ["date1", "board"],
             None,
             "获取当日涨停热点板块及其连板梯队数据"
         ),
         "uplimit_stocks": (
-            "open/review/uplimit/stocks/{date1}",
+            "v3/open/review/uplimit/stocks/{date1}",
             ["date1"],
             None,
             "获取指定日期所有涨停股票的列表"
@@ -51,7 +51,7 @@ class DataApi(BaseDataApi):
             "市场热度数据量化出来的 K 线数据"
         ),
         "market_style": (
-            "v2/api/timing/market/style",
+            "v3/api/timing/market/style",
             ["date1"],
             None,
             "市场风格评估数据,适合什么风格的市场,量化出来的K线数据"
@@ -70,7 +70,7 @@ class DataApi(BaseDataApi):
         ),
         # Kline
         "daily": (
-            "open/kline/d/{code}",
+            "v3/open/kline/d/{code}",
             ["code", "date1", "date2"],
             kline_data_to_df,
             "获取日线行情数据"
@@ -83,20 +83,20 @@ class DataApi(BaseDataApi):
         ),
         # Base Data
         "trade_days": (
-            "market/trade/days",
+            "v3/market/trade/days",
             ["day_start", "day_end", "days"],
             None,
             "查询 A 股交易日历（识别交易日与假期）"
         ),
         # Third Party
         "ths_hot_top": (
-            "open/sentiment/media/ths2/top",
+            "v3/open/sentiment/media/ths2/top",
             ["date1", "top_n"],
             None,
             "获取同花顺热搜榜前 N 名龙头的实时排名"
         ),
         "stock_ths_hot": (
-            "v2/api/sentiment/media/ths/symbol/{code}",
+            "v3/api/sentiment/media/ths/symbol/{code}",
             ["code", "date1"],
             None,
             "查询特定股票在同花顺平台的热度趋势"
@@ -159,32 +159,32 @@ class DataApi(BaseDataApi):
         ),
         # 龙虎榜数据
         "lhb_list": (
-            "market/lhb/list",
+            "v3/market/lhb/list",
             ["date1"],
             None,
             "龙虎榜每日上榜股票概览列表"
         ),
         "lhb_detail": (
-            "market/lhb/detail",
+            "v3/market/lhb/detail",
             ["date1", "stock_code"],
             None,
             "查询特定股票的龙虎榜席位买卖详情"
         ),
         "lhb_stock_history": (
-            "market/lhb/stock/history",
+            "v3/market/lhb/stock/history",
             ["stock_code", "trader_name"],
             None,
             "查询个股或特定营业部的历史龙虎榜表现"
         ),
         "lhb_trader_history": (
-            "market/lhb/trader/history",
+            "v3/market/lhb/trader/history",
             ["trader_name", "trader_id", "stock_code", "page", "per_page"],
             None,
             "龙虎榜知名游资/席位的历史交易轨迹"
         ),
         # 板块数据
         "plates_list": (
-            "market/plates/{plate_type}",
+            "v3/market/plates/{plate_type}",
             ["plate_type"],
             None,
             "获取指定类型（（17(题材)/15(概念)/14(行业)）的所有板块列表"
@@ -196,7 +196,7 @@ class DataApi(BaseDataApi):
             "获取全市场所有板块（17(题材)/15(概念)/14(行业)）的热度排名"
         ),
         "plates_trend": (
-            "market/plates/{plate_type}/trend",
+            "v3/market/plates/{plate_type}/trend",
             ["plate_type", "plate_code", "day_start", "day_end"],
             None,
             "指定板块的分时数据"
@@ -214,32 +214,32 @@ class DataApi(BaseDataApi):
             "获取指定板块Top N，并标记是否是前几天新进的（区间排名+新进标记）"
         ),
         "plates_stocks": (
-            "market/plates/{plate_type}/{plate_code}/stocks",
+            "v3/market/plates/{plate_type}/{plate_code}/stocks",
             ["plate_type", "plate_code", "date"],
             None,
             "查询特定板块包含的所有个股详情"
         ),
         # 涨跌分布与情绪
         "updown_distribution": (
-            "open/sentiment/updown/disctribution",
+            "v3/open/sentiment/updown/disctribution",
             ["date1"],
             None,
             "全市场每日上涨、下跌家数分布及涨停/跌停总数统计"
         ),
         "uplimit_trend": (
-            "open/sentiment/uplimit/trend",
+            "v3/open/sentiment/uplimit/trend",
             ["date1"],
             None,
             "全市场涨停家数趋势及赚钱效应分析"
         ),
         "sentiment_hot_day": (
-            "open/sentiment/hot/day",
+            "v3/open/sentiment/hot/day",
             ["index", "st"],
             None,
             "市场每日核心人气热点排名"
         ),
         "sentiment_bull_data": (
-            "open/sentiment/bull/data",
+            "v3/open/sentiment/bull/data",
             ["date1", "date2"],
             None,
             "多空情绪对比及牛市指标参考"
@@ -259,7 +259,7 @@ class DataApi(BaseDataApi):
         # ),
         # 涨停市值统计
         "uplimit_market_value": (
-            "v2/api/uplimit/market/value",
+            "v3/api/uplimit/market/value",
             ["date1", "date2"],
             None,
             "基于市值的涨停板个股分布统计"
@@ -273,14 +273,14 @@ class DataApi(BaseDataApi):
         # ),
         # 异动数据
         "movement_alerts": (
-            "market/movement/alerts",
+            "v3/market/movement/alerts",
             ["date1", "type", "limit", "is_real"],
             None,
             "沪深涨幅触发监管以及距离触发的空间"
         ),
         # 监控数据
         "zdjk_get": (
-            "open/zdjk/get",
+            "v3/open/zdjk/get",
             ["date1", "date2"],
             None,
             "已经触发监管的股票列表"
