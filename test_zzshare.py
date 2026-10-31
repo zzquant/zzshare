@@ -18,8 +18,8 @@ api = DataApi(
 # print([method for method in dir(api) if not method.startswith('_')])
 # 注意检查 pyproject.toml 中的 version 是否与实际版本一致
 # git push
-# git tag v0.4.11
-# git push origin v0.4.11
+# git tag v0.4.13
+# git push origin v0.4.13
 
 # 获取日线行情
 # df = api.daily(ts_code='920978.BJ', start_date='20250101', end_date='20250131')
@@ -96,5 +96,40 @@ print(basic)
 
 
 # 1. 查询 2024-12-31 的日频估值数据 (默认 source 为 jq)
-df_val = api.finance_valuation("2025-12-31")
-print(df_val.head())
+# df_val = api.finance_valuation("2025-12-31")
+# print(df_val.head())
+
+# ---------------- 板块分时数据（1分钟级别分时走势 / 分钟K线） ----------------
+# 说明区分：
+# 1. api.trend_minute(code, [date], [as_df]):
+#    获取个股或板块的分钟级真实分时走势（每交易日 241 个 1 分钟点位，包含时间、价格/点位、均价、成交量、涨跌幅等）。
+#    支持板块代码（如概念板块 '801660'）以及个股代码。
+# 2. api.plates_trend(plate_type, plate_code, day_start, day_end):
+#    获取板块日级别历史指标走势（每日一行，包含当日涨跌幅、主力资金、热度排名等）。
+
+# (1) 板块最新/当日 1 分钟级分时数据 (返回原始 Dict)
+print("\n=== 1. 板块当日分时走势 (1分钟分时点位，原始数据) ===")
+fenshi_dict = api.trend_minute(code='801660')
+if isinstance(fenshi_dict, dict):
+    print(f"板块代码: {fenshi_dict.get('code')}, 日期: {fenshi_dict.get('day')}, 昨收点位: {fenshi_dict.get('preclose_px')}")
+    print(f"分时分钟数: {len(fenshi_dict.get('trend', []))} 根")
+    print("前 3 根分时 [时间, 点位, 均价, 成交量, 方向]:", fenshi_dict.get('trend', [])[:3])
+else:
+    print(fenshi_dict)
+
+# (2) 板块分钟级分时数据直接转为 DataFrame
+print("\n=== 2. 板块当日分时走势 (DataFrame 格式) ===")
+df_fenshi = api.trend_minute(code='801660', as_df=True)
+print(df_fenshi.head(10))
+print(df_fenshi.tail(5))
+
+# (3) 查询指定历史日期的板块 1 分钟级分时走势
+print("\n=== 3. 板块历史某日分时走势 (2026-10-30) ===")
+df_fenshi_his = api.trend_minute(code='801660', date='2026-10-30', as_df=True)
+print(f"历史分时记录数: {len(df_fenshi_his)} 条")
+if not df_fenshi_his.empty:
+    print(df_fenshi_his[['trade_time', 'price', 'avg_price', 'vol', 'pct_chg']].head())
+
+# (4) 区别说明：板块日级别历史走势与指标数据 (每日 1 条)
+# daily_trend = api.plates_trend(plate_type=17, plate_code='801660', day_start='20260401', day_end='20261016')
+# print(pd.DataFrame(daily_trend).head())

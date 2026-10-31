@@ -3,7 +3,7 @@ from typing import Any, Optional, Dict, Callable, List, Union
 import pandas as pd
 
 from zzshare.core import BaseDataApi
-from zzshare.utils import kline_data_to_df, plate_kline_to_df, finance_data_to_df
+from zzshare.utils import kline_data_to_df, plate_kline_to_df, finance_data_to_df, trend_data_to_df
 from zzshare.logger import logger
 
 
@@ -199,7 +199,19 @@ class DataApi(BaseDataApi):
             "v3/market/plates/{plate_type}/trend",
             ["plate_type", "plate_code", "day_start", "day_end"],
             None,
-            "指定板块的分时数据"
+            "获取指定板块的历史日级别走势与指标数据（如区间每日热度、涨跌幅、主力资金等）"
+        ),
+        "trend_minute": (
+            "v3/market/trend/{code}",
+            ["code"],
+            None,
+            "获取个股或板块的当日分时数据（1分钟级别分时K线/走势）"
+        ),
+        "trend_minute_date": (
+            "v3/market/trend/{code}/date/{date}",
+            ["code", "date"],
+            None,
+            "获取个股或板块指定日期的分时数据（1分钟级别分时K线/走势）"
         ),
         "plates_rank_days": (
             "v3/market/plates/{plate_type}/rank/days",
@@ -384,7 +396,7 @@ class DataApi(BaseDataApi):
     def _register_shortcuts(self):
         """根据 SHORTCUTS 表动态生成方法"""
         for name, entry in self.SHORTCUTS.items():
-            if name in ["daily", "plates_rank", "plates_rank_days", "plates_rank_days_new"]:
+            if name in ["daily", "plates_rank", "plates_rank_days", "plates_rank_days_new", "trend_minute"]:
                 continue
             
             # 支持旧的三元组或新的四元组
@@ -859,6 +871,34 @@ class DataApi(BaseDataApi):
         df = df.reindex(columns=ordered_columns)
         df = df.sort_values(by="trade_time", ascending=False).reset_index(drop=True)
         return df
+
+    def trend_minute(
+        self,
+        code: str,
+        date: Optional[str] = None,
+        as_df: bool = False
+    ) -> Any:
+        """
+        获取个股或板块的分钟级别分时数据（1分钟分时K线/走势）
+
+        :param code: 股票代码或板块代码（如 '801660' 概念板块，'000001' 个股）
+        :param date: 可选，指定历史交易日（格式支持 'YYYYMMDD' 或 'YYYY-MM-DD'）。若不传则获取最新/当日分时
+        :param as_df: 是否直接转换为包含 time, price, avg_price, vol, pct_chg 等字段的 DataFrame，默认为 False
+        :return: 包含 begin_px, preclose_px, trend 等的原始字典，或转换后的分时 DataFrame
+        """
+        if date:
+            clean_date = str(date).replace("-", "")
+            date_param = f"{clean_date[:4]}-{clean_date[4:6]}-{clean_date[6:]}" if len(clean_date) == 8 else str(date)
+            data = self._query(f"v3/market/trend/{code}/date/{date_param}")
+        else:
+            data = self._query(f"v3/market/trend/{code}")
+
+        if as_df:
+            return trend_data_to_df(data)
+        return data
+
+    plate_minute = trend_minute
+    plate_fenshi = trend_minute
 
     def plates_rank(self, plate_type: int, date1: str, limit: int = 10):
         """

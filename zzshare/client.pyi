@@ -219,6 +219,33 @@ class DataApi:
         day_start: str,
         day_end: str
     ) -> Any: ...
+
+    def trend_minute(
+        self,
+        code: str,
+        date: Optional[str] = None,
+        as_df: bool = False
+    ) -> Any: ...
+
+    def trend_minute_date(
+        self,
+        code: str,
+        date: str
+    ) -> Any: ...
+
+    def plate_minute(
+        self,
+        code: str,
+        date: Optional[str] = None,
+        as_df: bool = False
+    ) -> Any: ...
+
+    def plate_fenshi(
+        self,
+        code: str,
+        date: Optional[str] = None,
+        as_df: bool = False
+    ) -> Any: ...
     
     def plates_stocks(
         self,

@@ -152,6 +152,27 @@ class DataApiTest(unittest.TestCase):
     def test_plates_stocks(self):
         self._call_api_method("plates_stocks", plate_type=14, plate_code="881155")
 
+    def test_plates_trend(self):
+        # 板块日级别历史走势
+        self._call_api_method("plates_trend", plate_type=17, plate_code="801660", day_start="2026-04-01", day_end="2026-04-16")
+
+    def test_trend_minute_plate(self):
+        # 板块当日分钟级分时走势
+        result = self.api.trend_minute(code="801660")
+        assert result is not None, "板块分时结果不应为空"
+        assert "trend" in result, "板块分时应包含 trend 列表"
+
+    def test_trend_minute_plate_df(self):
+        # 板块分钟分时转 DataFrame
+        df = self.api.trend_minute(code="801660", as_df=True)
+        assert df is not None, "DataFrame 不应为空"
+        assert "time" in df.columns and "price" in df.columns, "应包含 time 和 price 列"
+
+    def test_trend_minute_date_plate(self):
+        # 板块指定日期的历史分钟分时
+        result = self.api.trend_minute(code="801660", date="2026-10-30")
+        assert result is not None, "历史板块分时结果不应为空"
+
     def test_updown_distribution(self):
         self._call_api_method("updown_distribution", date1="2026-02-03")
 
