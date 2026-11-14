@@ -12,6 +12,19 @@ class DataApi(BaseDataApi):
         super().__init__(token, timeout, http_url)
 
     SHORTCUTS = {
+        "pct_tier": (
+            "v3/market/pct-tier",
+            ["date1", "days"],
+            None,
+            "区间梯队（单日）：date1 为 YYYY-MM-DD（可省略），days 支持 10/20/30（默认 10）"
+        ),
+        "pct_tier_ladder": (
+            "v3/market/pct-tier/ladder",
+            ["end_date", "window_days", "display_days", "tier_type"],
+            None,
+            "涨幅天梯（多日）：end_date 为 YYYY-MM-DD（可省略），window_days 为 10/20/30（默认 10），"
+            "display_days 为 1–60 个交易日（默认 12），tier_type 为 up/down/all（默认 up）"
+        ),
         # Daily
         "uplimit_hot": (
             "v3/open/review/uplimit/hot",

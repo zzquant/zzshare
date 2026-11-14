@@ -719,3 +719,12 @@ MIT License
 </p>
 
 > 二维码有效期至 2026 年 11 月 11 日，过期后请等待更新。
+
+## 涨幅梯队
+
+```powershell
+zzshare-cli --format json pct_tier --date1 2026-11-13 --days 30
+zzshare-cli --format json pct_tier_ladder --end_date 2026-11-13 --window_days 30 --display_days 12 --tier_type up
+```
+
+区间梯队按一个基准日返回累计涨跌幅分组；涨幅天梯按多个交易日返回同口径分组，最新日期在前。统计窗口支持 10/20/30，默认 10。天梯展示 1–60 个交易日，默认 12；方向支持 up/down/all，默认 up。日期使用 YYYY-MM-DD，可省略。Python 中可直接调用 zzshare.pct_tier 和 zzshare.pct_tier_ladder，保留接口原始分组结构。

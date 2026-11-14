@@ -14,6 +14,18 @@ class DataApi:
 
     def query(self, path: str, params: Optional[Dict[str, Any]] = None) -> Any: ...
 
+    def pct_tier(
+        self, date1: Optional[str] = ..., days: int = ...
+    ) -> Optional[Dict[str, Any]]: ...
+
+    def pct_tier_ladder(
+        self,
+        end_date: Optional[str] = ...,
+        window_days: int = ...,
+        display_days: int = ...,
+        tier_type: str = ...,
+    ) -> Optional[Dict[str, Any]]: ...
+
     # ───────────── 以下为 IDE 补全用的显式签名 ─────────────
 
     def uplimit_hot(
