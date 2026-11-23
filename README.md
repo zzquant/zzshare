@@ -122,6 +122,26 @@ basic = api.stock_basic(exchange='SSE', list_status='L', fields='ts_code,symbol,
 
 ***
 
+## 💬 扫码入群
+
+欢迎使用微信扫描下方二维码，加入「自在量化27」交流群，一起交流 zzshare 使用经验与量化研究。
+
+<p align="center">
+  <img src="group1130.jpg" alt="自在量化27 微信交流群入群二维码" width="360" />
+</p>
+
+> 二维码在 2026 年 11 月 30 日前有效，过期后请等待更新。
+
+***
+
+## 📈 收益曲线
+
+<p align="center">
+  <img src="收益1123.jpg" alt="2026 年 11 月 23 日收益曲线" width="480" />
+</p>
+
+***
+
 ## 📖 使用示例
 
 ### 股票基础信息（兼容）
@@ -392,6 +412,15 @@ stocks = api.uplimit_stocks(date1='20250205')
 # 获取个股涨停原因
 reason = api.stock_uplimit_reason(stock_code='000001', date='20250205')
 ```
+
+### 涨幅梯队
+
+```powershell
+zzshare-cli --format json pct_tier --date1 2026-11-13 --days 30
+zzshare-cli --format json pct_tier_ladder --end_date 2026-11-13 --window_days 30 --display_days 12 --tier_type up
+```
+
+区间梯队按一个基准日返回累计涨跌幅分组；涨幅天梯按多个交易日返回同口径分组，最新日期在前。统计窗口支持 10/20/30，默认 10。天梯展示 1–60 个交易日，默认 12；方向支持 up/down/all，默认 up。日期使用 YYYY-MM-DD，可省略。Python 中可直接调用 zzshare.pct_tier 和 zzshare.pct_tier_ladder，保留接口原始分组结构。
 
 ### 龙虎榜
 
@@ -707,24 +736,3 @@ MIT License
 <p align="center">
   ⭐ 如果这个项目对你有帮助，请给它一个 Star！
 </p>
-
-***
-
-## 💬 扫码入群
-
-欢迎使用微信扫描下方二维码，加入「自在量化27」交流群，一起交流 zzshare 使用经验与量化研究。
-
-<p align="center">
-  <img src="group1112.jpg" alt="自在量化27 微信交流群入群二维码" width="360" />
-</p>
-
-> 二维码在 2026 年 11 月 23 日前有效，过期后请等待更新。
-
-## 涨幅梯队
-
-```powershell
-zzshare-cli --format json pct_tier --date1 2026-11-13 --days 30
-zzshare-cli --format json pct_tier_ladder --end_date 2026-11-13 --window_days 30 --display_days 12 --tier_type up
-```
-
-区间梯队按一个基准日返回累计涨跌幅分组；涨幅天梯按多个交易日返回同口径分组，最新日期在前。统计窗口支持 10/20/30，默认 10。天梯展示 1–60 个交易日，默认 12；方向支持 up/down/all，默认 up。日期使用 YYYY-MM-DD，可省略。Python 中可直接调用 zzshare.pct_tier 和 zzshare.pct_tier_ladder，保留接口原始分组结构。
