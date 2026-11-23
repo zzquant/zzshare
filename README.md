@@ -122,23 +122,23 @@ basic = api.stock_basic(exchange='SSE', list_status='L', fields='ts_code,symbol,
 
 ***
 
-## 💬 扫码入群
-
-欢迎使用微信扫描下方二维码，加入「自在量化27」交流群，一起交流 zzshare 使用经验与量化研究。
-
-<p align="center">
-  <img src="group1130.jpg" alt="自在量化27 微信交流群入群二维码" width="360" />
-</p>
-
-> 二维码在 2026 年 11 月 30 日前有效，过期后请等待更新。
-
-***
-
-## 📈 收益曲线
-
-<p align="center">
-  <img src="收益1123.jpg" alt="2026 年 11 月 23 日收益曲线" width="480" />
-</p>
+<table align="center">
+  <tr>
+    <th align="center">💬 扫码入群</th>
+    <th align="center">📈 收益曲线</th>
+  </tr>
+  <tr>
+    <td align="center" valign="top">
+      <img src="group1130.jpg" alt="自在量化27 微信交流群入群二维码" height="320" /><br />
+      自在量化27 交流群<br />
+      二维码在 2026 年 11 月 30 日前有效
+    </td>
+    <td align="center" valign="top">
+      <img src="收益1123.jpg" alt="2026 年 11 月 23 日收益曲线" height="320" /><br />
+      2026 年 11 月 23 日
+    </td>
+  </tr>
+</table>
 
 ***
 
