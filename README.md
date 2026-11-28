@@ -129,13 +129,13 @@ basic = api.stock_basic(exchange='SSE', list_status='L', fields='ts_code,symbol,
   </tr>
   <tr>
     <td align="center" valign="top">
-      <img src="group1130.jpg" alt="自在量化27 微信交流群入群二维码" height="320" /><br />
+      <img src="group1205.jpg" alt="自在量化27 微信交流群入群二维码" height="320" /><br />
       自在量化27 交流群<br />
-      二维码在 2026 年 11 月 30 日前有效
+      二维码在 2026 年 12 月 5 日前有效
     </td>
     <td align="center" valign="top">
-      <img src="收益1123.jpg" alt="2026 年 11 月 23 日收益曲线" height="320" /><br />
-      2026 年 11 月 23 日
+      <img src="收益1127.jpg" alt="2026 年 11 月 27 日收益曲线" height="320" /><br />
+      2026 年 11 月 27 日
     </td>
   </tr>
 </table>
